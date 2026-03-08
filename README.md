@@ -326,14 +326,16 @@ CREATE DATABASE sdot_db DEFAULT CHARACTER SET utf8mb4;
 
 -- 센서 측정 데이터
 CREATE TABLE sdot_nature_all (
-    시리얼 VARCHAR(20),
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    시리얼 VARCHAR(50),
+    자치구 VARCHAR(100),
+    행정동 VARCHAR(100),
+    온도_평균 FLOAT,
+    습도_평균 FLOAT,
     등록일시 DATETIME,
-    온도 FLOAT, 습도 FLOAT, 소음 FLOAT,
-    풍향 FLOAT, 풍속 FLOAT,
-    PM10 FLOAT, PM25 FLOAT,
-    -- 기타 17종 환경 지표 컬럼
     INDEX idx_date (등록일시),
-    INDEX idx_serial (시리얼)
+    INDEX idx_serial (시리얼),
+    INDEX idx_district (자치구)
 );
 
 -- 센서 위치 정보
@@ -419,7 +421,7 @@ graph TB
     subgraph RAILWAY_PROJECT["Railway 프로젝트"]
         direction TB
         WEB["🌐 Web Service<br><b>FastAPI 서버</b><br><i>Dockerfile 기반</i><br>PORT 자동 할당"]
-        DB_EXT["🗄️ External MySQL<br><i>외부 DB 서버</i>"]
+        DB_EXT["🗄️ MySQL-oTZw<br><i>Railway MySQL</i>"]
     end
 
     subgraph ENV_VARS["환경변수 (Variables 탭)"]
@@ -473,4 +475,4 @@ Railway 내부에서 MySQL을 사용하려면:
 2. MySQL 서비스의 연결 정보가 환경변수로 자동 주입됨
 3. `DB_HOST`, `DB_PORT` 등을 Railway 제공 변수(`${{MySQL.MYSQL_HOST}}` 등)로 참조
 
-> **참고**: 이 프로젝트는 외부 MySQL 서버를 사용하므로 Railway MySQL 추가는 선택사항입니다.
+> **참고**: 이 프로젝트는 Railway 내부 MySQL을 사용합니다. 위 단계대로 MySQL 서비스를 추가하고 환경변수를 연결하세요.
