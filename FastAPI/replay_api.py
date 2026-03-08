@@ -66,18 +66,17 @@ async def lifespan(app):
     2. 데이터베이스 연결 풀 종료
     """
     # === 시작 시 실행 ===
-    initialize_db_pool()
-    cache.start_cleanup_thread(cleanup_interval=60)
-
     try:
+        initialize_db_pool()
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT 1")
             cursor.close()
         logger.info("DB 연결 풀 테스트 성공")
     except Exception as e:
-        logger.error(f"DB 연결 풀 테스트 실패: {e}")
-        raise
+        logger.warning(f"DB 연결 실패 (서버는 계속 시작): {e}")
+
+    cache.start_cleanup_thread(cleanup_interval=60)
 
     yield  # 서버 실행 중
 
@@ -152,9 +151,10 @@ if __name__ == "__main__":
     print("=" * 50)
 
     # 서버 실행
+    port = int(os.getenv("PORT", 8000))  # Railway는 PORT 환경변수를 제공
     uvicorn.run(
         app,  # FastAPI 앱 객체
         host="0.0.0.0",  # 모든 네트워크 인터페이스에서 접속 허용 (외부 접속 가능)
-        port=8000,  # 포트 번호 (브라우저에서 :8000으로 접속)
+        port=port,  # 포트 번호
         log_level="info"  # 로그 레벨 (info 이상만 출력)
     )
