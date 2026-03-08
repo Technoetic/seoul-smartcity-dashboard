@@ -378,3 +378,45 @@ cd FastAPI && python replay_api.py
 docker build -t sdot-dashboard .
 docker run -p 8000:8000 --env-file FastAPI/.env sdot-dashboard
 ```
+
+### 5. Railway 배포
+
+이 프로젝트는 [Railway](https://railway.app/)에 호스팅되어 있습니다.
+
+#### 배포 단계
+
+**1) GitHub 연결**
+
+Railway 대시보드에서 **New Project → Deploy from GitHub repo** 를 선택하고 이 저장소를 연결합니다.
+
+**2) 환경변수 설정**
+
+Railway 프로젝트의 **Variables** 탭에서 다음 환경변수를 추가합니다:
+
+| 변수 | 설명 |
+|:-----|:-----|
+| `DB_HOST` | MySQL 호스트 (Railway MySQL 사용 시 자동 제공) |
+| `DB_PORT` | MySQL 포트 |
+| `DB_USER` | MySQL 사용자 |
+| `DB_PASSWORD` | MySQL 비밀번호 |
+| `DB_NAME` | `sdot_db` |
+| `SDOT_API_KEY` | 서울시 Open API 인증키 |
+| `CORS_ORIGINS` | 허용 Origin (예: `https://your-app.up.railway.app`) |
+
+**3) 빌드 & 배포**
+
+Railway는 Dockerfile을 자동 감지하여 빌드합니다. 별도의 빌드 설정 없이 `main` 브랜치에 push하면 자동 배포됩니다.
+
+- **빌드**: `Dockerfile` 기반 (python:3.11-slim)
+- **포트**: Railway가 `PORT` 환경변수를 자동 주입하며, FastAPI 서버가 해당 포트에서 리슨
+- **배포 URL**: `https://<project-name>.up.railway.app/`
+
+**4) MySQL 추가 (선택)**
+
+Railway 내부에서 MySQL을 사용하려면:
+
+1. 프로젝트에서 **+ New** → **Database** → **MySQL** 추가
+2. MySQL 서비스의 연결 정보가 환경변수로 자동 주입됨
+3. `DB_HOST`, `DB_PORT` 등을 Railway 제공 변수(`${{MySQL.MYSQL_HOST}}` 등)로 참조
+
+> **참고**: 이 프로젝트는 외부 MySQL 서버를 사용하므로 Railway MySQL 추가는 선택사항입니다.
