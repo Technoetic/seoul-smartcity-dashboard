@@ -231,13 +231,13 @@ async def get_metadata():
         with get_db_connection() as conn:
             cursor = conn.cursor()
             # 집계 함수를 사용하여 통계 정보 추출
+            # min/max use index, avoid COUNT(*) on 45M rows
             cursor.execute("""
                 SELECT
-                    MIN(DATE(등록일시)) as min_date,  -- 가장 오래된 데이터 날짜
-                    MAX(DATE(등록일시)) as max_date,  -- 가장 최신 데이터 날짜
-                    COUNT(DISTINCT 시리얼) as sensor_count,  -- 센서 개수 (중복 제거)
-                    COUNT(*) as total_records  -- 전체 레코드 수
-                FROM sdot_nature_all
+                    DATE((SELECT 등록일시 FROM sdot_nature_all ORDER BY 등록일시 ASC LIMIT 1)) as min_date,
+                    DATE((SELECT 등록일시 FROM sdot_nature_all ORDER BY 등록일시 DESC LIMIT 1)) as max_date,
+                    (SELECT COUNT(*) FROM sdot_sensor_locations) as sensor_count,
+                    (SELECT TABLE_ROWS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='sdot_nature_all') as total_records
             """)
             row = cursor.fetchone()
 
