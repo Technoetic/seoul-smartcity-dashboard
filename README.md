@@ -23,15 +23,15 @@
 
 ```mermaid
 graph TB
-    subgraph EXTERNAL["External Data Sources"]
+    subgraph EXTERNAL["외부 데이터 소스"]
         SDOT_API["서울시 S-DoT Open API<br><i>IotVdata017</i>"]
         GEOJSON["GitHub Raw<br><i>구/동 GeoJSON</i>"]
     end
 
-    subgraph SERVER["FastAPI Server"]
+    subgraph SERVER["FastAPI 서버"]
         direction TB
         MAIN["replay_api.py<br><b>메인 서버</b>"]
-        ROUTES["routes.py<br><i>6 API endpoints</i>"]
+        ROUTES["routes.py<br><i>8 API endpoints</i>"]
         CACHE_MOD["cache.py<br><i>LRU Cache</i>"]
         DB_MOD["database.py<br><i>Connection Pool</i>"]
     end
@@ -43,11 +43,11 @@ graph TB
         T3[("weather_stations<br><i>기상 관측소</i>")]
     end
 
-    subgraph CLIENT["Browser"]
+    subgraph CLIENT["브라우저"]
         direction TB
         HTML["index.html"]
         D3["D3.js SVG Map"]
-        JS["20 JS Modules"]
+        JS["23 JS Modules"]
         CSS["13 CSS Modules"]
     end
 
@@ -145,52 +145,6 @@ flowchart LR
 
 ## 프로젝트 구조
 
-```mermaid
-graph TD
-    ROOT["sdot_dashboard/"]
-
-    ROOT --> DOCKER["Dockerfile"]
-    ROOT --> REQ["requirements.txt"]
-    ROOT --> START["start.sh"]
-    ROOT --> FASTAPI_DIR["FastAPI/"]
-    ROOT --> FRONT_DIR["Front/"]
-
-    subgraph BACKEND["FastAPI/ — Backend"]
-        F1["replay_api.py — 메인 서버"]
-        F2["routes.py — API 엔드포인트"]
-        F3["database.py — DB 연결 풀"]
-        F4["cache.py — LRU 캐시"]
-        F5["config.py — 환경변수"]
-    end
-
-    subgraph FRONTEND["Front/ — Frontend"]
-        IDX["index.html — SPA 엔트리"]
-
-        subgraph CSS_DIR["css/ — 13 stylesheets"]
-            C1["base / map / navbar"]
-            C2["panels / markers / legend"]
-            C3["alerts / animations / responsive"]
-        end
-
-        subgraph JS_DIR["js/ — 20 modules"]
-            J1["config / init / api"]
-            J2["map / dong-* / view"]
-            J3["sensor-* / replay-*"]
-            J4["anomaly / wind / ui-*"]
-        end
-    end
-
-    FASTAPI_DIR --> BACKEND
-    FRONT_DIR --> FRONTEND
-
-    style ROOT fill:#0d1b2a,stroke:#00d9ff,color:#fff
-    style BACKEND fill:#1a1a2e,stroke:#e94560,color:#fff
-    style FRONTEND fill:#1a1a2e,stroke:#53d769,color:#fff
-```
-
-<details>
-<summary><b>전체 파일 목록 (클릭하여 펼치기)</b></summary>
-
 ```
 sdot_dashboard/
 ├── Dockerfile                    # python:3.11-slim 기반 컨테이너
@@ -222,7 +176,7 @@ sdot_dashboard/
     │   ├── animations.css        #   전환 애니메이션
     │   ├── responsive.css        #   반응형
     │   └── utilities.css         #   유틸리티
-    └── js/                       # 20 modules
+    └── js/                       # 23 modules
         ├── config.js             #   전역 설정/상태
         ├── init.js               #   초기화
         ├── api.js                #   API 통신
@@ -247,8 +201,6 @@ sdot_dashboard/
         ├── http-status.js        #   HTTP 상태 모니터링
         └── utils.js              #   유틸 함수
 ```
-
-</details>
 
 ---
 
