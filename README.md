@@ -153,7 +153,7 @@ sdot_dashboard/
 │
 ├── FastAPI/
 │   ├── replay_api.py             # 메인 서버 (CORS, GZip, 정적 파일 서빙)
-│   ├── routes.py                 # API 엔드포인트 (9개 라우트)
+│   ├── routes.py                 # API 엔드포인트 (8개 라우트)
 │   ├── database.py               # DB 연결 풀 관리 (PooledDB)
 │   ├── cache.py                  # LRU 캐시 (3개 독립 캐시 + 정리 스레드)
 │   ├── config.py                 # 환경변수 로드 + 로깅
