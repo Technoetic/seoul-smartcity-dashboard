@@ -1,184 +1,329 @@
-# S-DoT 서울 스마트시티 대시보드
-
-> 서울시 전역 1,200+ IoT 센서의 환경 데이터를 D3.js 인터랙티브 지도 위에 실시간 시각화하고, 과거 시점의 데이터를 시간축으로 재생할 수 있는 도시 환경 모니터링 대시보드
-
 <div align="center">
 
-**[Live Demo](https://seoul-smartcity-dashboard.onrender.com/)**
+# S-DoT 서울 스마트시티 대시보드
+
+**서울시 전역 1,200+ IoT 센서의 환경 데이터를 실시간 시각화하는 도시 모니터링 플랫폼**
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-서울_스마트시티_대시보드-00d9ff?style=for-the-badge&logo=googlemaps&logoColor=white)](https://seoul-smartcity-dashboard.onrender.com/)
+
+<br>
+
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![D3.js](https://img.shields.io/badge/D3.js-v7-F9A03C?style=flat-square&logo=d3dotjs&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)
 
 </div>
 
 ---
 
-## 시스템 구성도
+## 대시보드 미리보기
+
+<table>
+<tr>
+<td width="50%">
+
+**서울시 전체 뷰**
+
+온도 기반 5단계 히트맵으로 25개 자치구 시각화
+
+<img src=".claude/screenshots/full-check-v4.png" alt="서울시 전체 뷰" width="100%">
+
+</td>
+<td width="50%">
+
+**센서 레이어 ON**
+
+ASOS / AWS / RTD / S-DoT 센서 마커 오버레이
+
+<img src=".claude/screenshots/sensor-v9-on.png" alt="센서 레이어 ON" width="100%">
+
+</td>
+</tr>
+</table>
+
+---
+
+## 시스템 아키텍처
 
 ```mermaid
 graph TB
-    subgraph Browser
-        HTML["index.html + D3.js SVG"]
-        subgraph Frontend Modules
-            CONFIG["config.js — API URL, 자치구 코드"]
-            API["api.js — Open API 프록시 호출"]
-            MAP["map.js — 구 경계선 렌더링"]
-            DONG["dong-*.js — 동 확대/오버레이"]
-            SENSOR["sensor-*.js — ASOS/AWS/RTD/S-DoT 마커"]
-            REPLAY_FE["replay-*.js — 시간축 재생 UI"]
-            ANOMALY["anomaly.js — 이상치 감지 경보"]
-            WIND["wind.js — 풍향 나침반"]
-        end
-        HTML --> CONFIG & API & MAP & DONG & SENSOR & REPLAY_FE & ANOMALY & WIND
+    subgraph EXTERNAL["External Data Sources"]
+        SDOT_API["서울시 S-DoT Open API<br><i>IotVdata017</i>"]
+        GEOJSON["GitHub Raw<br><i>구/동 GeoJSON</i>"]
     end
 
-    subgraph FastAPI
-        MAIN["replay_api.py — 메인 서버"]
-        subgraph Modules
-            ROUTES["routes.py — /sensors, /replay, /metadata, /sdot-proxy"]
-            DB["database.py — PooledDB 연결 풀"]
-            CACHE["cache.py — LRU 캐시 (TTL 기반)"]
-            CONF["config.py — 환경변수, 로깅"]
-        end
-        MAIN --> ROUTES & DB & CACHE & CONF
+    subgraph SERVER["FastAPI Server"]
+        direction TB
+        MAIN["replay_api.py<br><b>메인 서버</b>"]
+        ROUTES["routes.py<br><i>6 API endpoints</i>"]
+        CACHE_MOD["cache.py<br><i>LRU Cache</i>"]
+        DB_MOD["database.py<br><i>Connection Pool</i>"]
     end
 
-    subgraph MySQL
-        T1["sdot_nature_all — 센서 측정 데이터"]
-        T2["sdot_sensor_locations — 센서 위치"]
-        T3["weather_stations — 기상 관측소"]
-        T4["rtd_locations — 도시데이터 관측 지점"]
+    subgraph DATABASE["MySQL"]
+        direction LR
+        T1[("sdot_nature_all<br><i>센서 측정 데이터</i>")]
+        T2[("sdot_sensor_locations<br><i>센서 위치</i>")]
+        T3[("weather_stations<br><i>기상 관측소</i>")]
     end
 
-    subgraph External
-        SDOT_API["서울시 S-DoT Open API — 실시간 30초 주기"]
-        GEOJSON["GitHub Raw — 구/동 GeoJSON"]
+    subgraph CLIENT["Browser"]
+        direction TB
+        HTML["index.html"]
+        D3["D3.js SVG Map"]
+        JS["20 JS Modules"]
+        CSS["13 CSS Modules"]
     end
 
-    Browser -- "fetch()" --> FastAPI
-    FastAPI -- "SQL Query" --> MySQL
-    FastAPI -- "CORS Proxy" --> SDOT_API
-    Browser -- "GeoJSON Fetch" --> GEOJSON
+    SDOT_API -- "CORS Proxy" --> ROUTES
+    GEOJSON -- "fetch()" --> CLIENT
+    CLIENT -- "REST API" --> ROUTES
+    ROUTES --> CACHE_MOD
+    ROUTES --> DB_MOD
+    DB_MOD -- "PooledDB" --> DATABASE
+    MAIN --> ROUTES
+
+    style EXTERNAL fill:#1a1a2e,stroke:#e94560,color:#fff
+    style SERVER fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style DATABASE fill:#1a1a2e,stroke:#00d9ff,color:#fff
+    style CLIENT fill:#1a1a2e,stroke:#53d769,color:#fff
 ```
 
 ---
 
 ## 주요 기능
 
+<table>
+<tr>
+<td width="50%" valign="top">
+
 ### 실시간 모니터링
 
-- 서울시 25개 자치구를 온도 기반 5단계 색상(영하 ~ 폭염)으로 표현하는 D3.js SVG 지도
-- 자치구 클릭 시 행정동 단위로 드릴다운, 동 클릭 시 해당 센서까지 확대
-- 실시간 환경정보 패널: 온도, 습도, 소음, 풍향(SVG 나침반), 풍속
-- 센서 레이어 토글: ASOS (종관기상관측), AWS (자동기상관측), RTD (실시간 도시데이터), S-DoT 개별 ON/OFF
-- 이상치 감지 경보 알림 바 (PM2.5 등 환경 이상 발생 시 흐르는 텍스트 알림)
+| 기능 | 설명 |
+|:----:|------|
+| 🗺️ | 25개 자치구 **온도 히트맵** (영하/서늘/쾌적/더움/폭염) |
+| 🔍 | 자치구 → 행정동 → 센서 **3단계 드릴다운** |
+| 🌡️ | 온도, 습도, 소음, 풍향/풍속 **실시간 패널** |
+| 📡 | ASOS / AWS / RTD / S-DoT **센서 레이어 토글** |
+| ⚠️ | PM2.5 등 **이상치 감지 경보** 알림 바 |
+| 🧭 | SVG **풍향 나침반** 애니메이션 |
+
+</td>
+<td width="50%" valign="top">
 
 ### Replay (과거 데이터 재생)
 
-- 날짜/시간 슬라이더로 과거 센서 데이터를 시간축 탐색
-- 자동 재생: 0.5x / 1x / 2x 속도로 시간대별 자동 전환
-- 데이터 없는 시간대는 ±12시간 범위에서 가장 가까운 시간대 자동 탐색
-- DB 캐시: 오늘 데이터 5분, 과거 데이터 7일 TTL
+| 기능 | 설명 |
+|:----:|------|
+| 📅 | 날짜 선택 + 시간 **슬라이더** (0~23시) |
+| ▶️ | 0.5x / 1x / 2x **자동 재생** |
+| 🔎 | 데이터 없는 시간대 **±12시간 자동 탐색** |
+| 💾 | 오늘: 5분 / 과거: 7일 **TTL 캐시** |
 
-### API 서버
+### API 서버 성능
 
-- GZip 압축 미들웨어 (1KB 이상 응답 자동 압축, 30~70% 전송량 절감)
-- 서울시 Open API CORS 프록시 (브라우저 직접 호출 불가 → 서버 경유)
-- LRU 캐시 (metadata 100개/24h, replay 2,000개/1h, daterange 500개/24h)
-- 연결 풀링 (PooledDB, 최대 10개 동시 연결)
+| 기능 | 설명 |
+|:----:|------|
+| 🗜️ | GZip 압축 (30~70% **전송량 절감**) |
+| 🔄 | 서울시 API **CORS 프록시** |
+| 📦 | LRU 캐시 **2,600 entries** |
+| 🔌 | DB 연결 풀 **최대 10 동시 연결** |
+
+</td>
+</tr>
+</table>
 
 ---
 
 ## 기술 스택
 
-| 계층 | 기술 |
-|------|------|
-| Frontend | Vanilla JS, D3.js v7 (SVG 지도 렌더링), CSS Grid/Flexbox |
-| Backend | Python 3.11, FastAPI, Uvicorn (ASGI) |
-| Database | MySQL (PyMySQL + DBUtils 연결 풀) |
-| 캐시 | In-memory LRU Cache (TTL + 백그라운드 정리 스레드) |
-| 배포 | Docker, Render |
-| 외부 API | 서울시 S-DoT Open API |
+<table>
+<tr>
+<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40"><br><b>JavaScript</b><br><sub>Vanilla ES6+</sub></td>
+<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/d3js/d3js-original.svg" width="40"><br><b>D3.js v7</b><br><sub>SVG 지도</sub></td>
+<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="40"><br><b>Python 3.11</b><br><sub>Backend</sub></td>
+<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="40"><br><b>FastAPI</b><br><sub>ASGI Server</sub></td>
+<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" width="40"><br><b>MySQL</b><br><sub>Database</sub></td>
+<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="40"><br><b>Docker</b><br><sub>Container</sub></td>
+</tr>
+</table>
 
 ---
 
-## 프로젝트 구조
+## 데이터 파이프라인
 
-```
-sdot_dashboard/
-├── Dockerfile                    # 컨테이너 빌드 (python:3.11-slim)
-├── requirements.txt              # Python 의존성
-├── start.sh                      # 서버 시작 스크립트
-│
-├── FastAPI/
-│   ├── replay_api.py             # 메인 서버 (CORS, GZip, 정적 파일 서빙)
-│   ├── routes.py                 # API 엔드포인트 (6개 라우트)
-│   ├── database.py               # DB 연결 풀 관리
-│   ├── cache.py                  # LRU 캐시 (3개 독립 캐시)
-│   ├── config.py                 # 환경변수 로드, 로깅 설정
-│   ├── requirements.txt          # FastAPI 전용 의존성
-│   └── .env.example              # 환경변수 템플릿
-│
-└── Front/
-    ├── index.html                # SPA 엔트리 (D3.js + 패널 UI)
-    ├── css/
-    │   ├── style.css             # CSS 통합 진입점 (@import)
-    │   ├── base.css              # 전역 스타일, 다크 테마
-    │   ├── map.css               # 지도 SVG 스타일
-    │   ├── navbar.css            # 상단 네비게이션 바
-    │   ├── panels.css            # 공통 패널 박스
-    │   ├── panels-info.css       # 실시간 환경정보 패널
-    │   ├── panels-replay.css     # Replay 컨트롤 패널
-    │   ├── markers.css           # 센서 마커 스타일
-    │   ├── legend.css            # 지도 범례
-    │   ├── alerts.css            # 경보 알림 바
-    │   ├── animations.css        # 전환 애니메이션
-    │   ├── responsive.css        # 반응형 레이아웃
-    │   └── utilities.css         # 유틸리티 클래스
-    └── js/
-        ├── config.js             # 전역 설정/상태 (API URL, 구 코드 매핑)
-        ├── init.js               # 초기화 (센서 로드 → GeoJSON → 렌더링)
-        ├── api.js                # API 통신 (실시간 데이터 fetch + 파싱)
-        ├── map.js                # D3.js 구 경계선 SVG 렌더링
-        ├── dong-overlay.js       # 동 단위 경계선 오버레이
-        ├── dong-markers.js       # 동 내 센서 마커 배치
-        ├── dong-zoom.js          # 동 확대/축소 전환
-        ├── view.js               # 뷰 상태 관리 (city → dong → dongZoom)
-        ├── sensor-layer.js       # 센서 레이어 토글 (ASOS/AWS/RTD/S-DoT)
-        ├── sensor-markers.js     # 센서 마커 SVG 생성
-        ├── replay.js             # Replay 모드 토글/상태 관리
-        ├── replay-mode.js        # Replay 모드 진입/해제 로직
-        ├── replay-data.js        # Replay API 호출 + 데이터 처리
-        ├── replay-ui.js          # Replay 슬라이더/버튼 UI
-        ├── anomaly.js            # 이상치 감지 알고리즘
-        ├── wind.js               # 풍향 나침반 SVG 회전
-        ├── location.js           # 지역 진입 연출 애니메이션
-        ├── ui.js                 # 공통 UI 유틸리티
-        ├── ui-info.js            # 환경정보 패널 업데이트
-        ├── ui-tooltip.js         # 마우스 호버 툴팁
-        ├── ui-traceback.js       # 발원지 역추적 UI
-        ├── http-status.js        # HTTP 응답 상태 모니터링
-        └── utils.js              # 유틸 함수 (debounce, 색상 계산 등)
+```mermaid
+flowchart LR
+    subgraph LIVE["실시간 모드"]
+        direction LR
+        A["🌐 서울시<br>S-DoT API"]
+        B["🔄 FastAPI<br>Proxy"]
+        C["📊 Browser<br>Cache"]
+        D["🗺️ D3.js 지도<br>갱신"]
+        A -- "30초 주기" --> B --> C --> D
+    end
+
+    subgraph REPLAY["Replay 모드"]
+        direction LR
+        E[("🗄️ MySQL<br>sdot_nature_all")]
+        F["⚡ FastAPI<br>+ LRU Cache"]
+        G["⏪ Browser<br>시간축 재생"]
+        E -- "SQL Query" --> F --> G
+    end
+
+    style LIVE fill:#0d1b2a,stroke:#00d9ff,color:#e0e0e0
+    style REPLAY fill:#0d1b2a,stroke:#e94560,color:#e0e0e0
 ```
 
 ---
 
 ## API 명세
 
-| Method | Endpoint | 설명 | 캐시 TTL |
-|--------|----------|------|----------|
-| `GET` | `/` | 대시보드 메인 페이지 (index.html) | - |
-| `GET` | `/health` | 서버 상태 확인 | - |
-| `GET` | `/api/v1/sensors` | 센서 위치 목록 (S-DoT + ASOS + AWS + RTD) | 1시간 |
-| `GET` | `/api/v1/metadata` | 데이터 범위 메타데이터 (최소/최대 날짜, 센서 수) | 24시간 |
-| `GET` | `/api/v1/replay?date=YYYY-MM-DD&hour=0-23` | 특정 날짜/시간의 센서 데이터 | 오늘: 5분, 과거: 7일 |
-| `GET` | `/api/v1/replay/date-range?start=...&end=...` | 날짜 범위 내 데이터 존재 날짜 목록 | 24시간 |
-| `GET` | `/api/v1/sdot-proxy?district=...` | 서울시 Open API 프록시 (CORS 우회) | - |
-| `GET` | `/api/v1/cache/stats` | 캐시 통계 (히트율, 크기) | - |
-| `GET` | `/api/v1/cache/clear` | 캐시 전체 삭제 | - |
+```mermaid
+graph LR
+    subgraph API["REST API Endpoints"]
+        direction TB
+        E1["GET /health"]
+        E2["GET /api/v1/sensors"]
+        E3["GET /api/v1/metadata"]
+        E4["GET /api/v1/replay"]
+        E5["GET /api/v1/replay/date-range"]
+        E6["GET /api/v1/sdot-proxy"]
+        E7["GET /api/v1/cache/stats"]
+    end
+
+    style API fill:#1a1a2e,stroke:#0f3460,color:#fff
+```
+
+| Endpoint | 설명 | 파라미터 | 캐시 TTL |
+|:---------|:-----|:---------|:---------|
+| `GET /` | 대시보드 메인 페이지 | - | - |
+| `GET /health` | 서버 상태 확인 | - | - |
+| `GET /api/v1/sensors` | 센서 위치 목록 (S-DoT + ASOS + AWS + RTD) | - | `1시간` |
+| `GET /api/v1/metadata` | 데이터 범위 메타데이터 | - | `24시간` |
+| `GET /api/v1/replay` | 특정 날짜/시간의 센서 데이터 | `date`, `hour` | 오늘: `5분`, 과거: `7일` |
+| `GET /api/v1/replay/date-range` | 데이터 존재 날짜 목록 | `start`, `end` | `24시간` |
+| `GET /api/v1/sdot-proxy` | 서울시 Open API 프록시 | `district` | - |
+| `GET /api/v1/cache/stats` | 캐시 통계 | - | - |
+| `GET /api/v1/cache/clear` | 캐시 전체 삭제 | - | - |
+
+---
+
+## 프로젝트 구조
+
+```mermaid
+graph TD
+    ROOT["sdot_dashboard/"]
+
+    ROOT --> DOCKER["Dockerfile"]
+    ROOT --> REQ["requirements.txt"]
+    ROOT --> START["start.sh"]
+    ROOT --> FASTAPI_DIR["FastAPI/"]
+    ROOT --> FRONT_DIR["Front/"]
+
+    subgraph BACKEND["FastAPI/ — Backend"]
+        F1["replay_api.py — 메인 서버"]
+        F2["routes.py — API 엔드포인트"]
+        F3["database.py — DB 연결 풀"]
+        F4["cache.py — LRU 캐시"]
+        F5["config.py — 환경변수"]
+    end
+
+    subgraph FRONTEND["Front/ — Frontend"]
+        IDX["index.html — SPA 엔트리"]
+
+        subgraph CSS_DIR["css/ — 13 stylesheets"]
+            C1["base / map / navbar"]
+            C2["panels / markers / legend"]
+            C3["alerts / animations / responsive"]
+        end
+
+        subgraph JS_DIR["js/ — 20 modules"]
+            J1["config / init / api"]
+            J2["map / dong-* / view"]
+            J3["sensor-* / replay-*"]
+            J4["anomaly / wind / ui-*"]
+        end
+    end
+
+    FASTAPI_DIR --> BACKEND
+    FRONT_DIR --> FRONTEND
+
+    style ROOT fill:#0d1b2a,stroke:#00d9ff,color:#fff
+    style BACKEND fill:#1a1a2e,stroke:#e94560,color:#fff
+    style FRONTEND fill:#1a1a2e,stroke:#53d769,color:#fff
+```
+
+<details>
+<summary><b>전체 파일 목록 (클릭하여 펼치기)</b></summary>
+
+```
+sdot_dashboard/
+├── Dockerfile                    # python:3.11-slim 기반 컨테이너
+├── requirements.txt              # Python 의존성
+├── start.sh                      # 서버 시작 스크립트
+│
+├── FastAPI/
+│   ├── replay_api.py             # 메인 서버 (CORS, GZip, 정적 파일 서빙)
+│   ├── routes.py                 # API 엔드포인트 (9개 라우트)
+│   ├── database.py               # DB 연결 풀 관리 (PooledDB)
+│   ├── cache.py                  # LRU 캐시 (3개 독립 캐시 + 정리 스레드)
+│   ├── config.py                 # 환경변수 로드 + 로깅
+│   ├── requirements.txt          # FastAPI 전용 의존성
+│   └── .env.example              # 환경변수 템플릿
+│
+└── Front/
+    ├── index.html                # SPA 엔트리 (D3.js + 패널 UI)
+    ├── css/                      # 13 stylesheets
+    │   ├── style.css             #   통합 진입점
+    │   ├── base.css              #   전역 스타일, 다크 테마
+    │   ├── map.css               #   지도 SVG
+    │   ├── navbar.css            #   상단 네비게이션
+    │   ├── panels.css            #   공통 패널
+    │   ├── panels-info.css       #   환경정보 패널
+    │   ├── panels-replay.css     #   Replay 패널
+    │   ├── markers.css           #   센서 마커
+    │   ├── legend.css            #   지도 범례
+    │   ├── alerts.css            #   경보 알림
+    │   ├── animations.css        #   전환 애니메이션
+    │   ├── responsive.css        #   반응형
+    │   └── utilities.css         #   유틸리티
+    └── js/                       # 20 modules
+        ├── config.js             #   전역 설정/상태
+        ├── init.js               #   초기화
+        ├── api.js                #   API 통신
+        ├── map.js                #   구 경계선 렌더링
+        ├── dong-overlay.js       #   동 경계선 오버레이
+        ├── dong-markers.js       #   동 센서 마커
+        ├── dong-zoom.js          #   동 확대/축소
+        ├── view.js               #   뷰 상태 관리
+        ├── sensor-layer.js       #   센서 레이어 토글
+        ├── sensor-markers.js     #   센서 마커 생성
+        ├── replay.js             #   Replay 토글
+        ├── replay-mode.js        #   Replay 진입/해제
+        ├── replay-data.js        #   Replay 데이터 처리
+        ├── replay-ui.js          #   Replay UI
+        ├── anomaly.js            #   이상치 감지
+        ├── wind.js               #   풍향 나침반
+        ├── location.js           #   지역 진입 연출
+        ├── ui.js                 #   공통 UI
+        ├── ui-info.js            #   환경정보 패널
+        ├── ui-tooltip.js         #   호버 툴팁
+        ├── ui-traceback.js       #   발원지 역추적
+        ├── http-status.js        #   HTTP 상태 모니터링
+        └── utils.js              #   유틸 함수
+```
+
+</details>
 
 ---
 
 ## 실행 방법
 
-### 환경변수 설정
+### 1. 환경변수 설정
 
 ```bash
 cp FastAPI/.env.example FastAPI/.env
@@ -193,7 +338,7 @@ DB_NAME=sdot_db
 SDOT_API_KEY=your_seoul_api_key
 ```
 
-### 로컬 실행
+### 2. 로컬 실행
 
 ```bash
 pip install -r requirements.txt
@@ -201,7 +346,7 @@ cd FastAPI && python replay_api.py
 # http://localhost:8000
 ```
 
-### Docker 실행
+### 3. Docker 실행
 
 ```bash
 docker build -t sdot-dashboard .
@@ -210,28 +355,8 @@ docker run -p 8000:8000 --env-file FastAPI/.env sdot-dashboard
 
 ---
 
-## 데이터 파이프라인
+<div align="center">
 
-```mermaid
-flowchart LR
-    subgraph "실시간 모드"
-        A["서울시 S-DoT API"] -- "30초 주기" --> B["FastAPI Proxy"]
-        B --> C["Browser Cache"]
-        C --> D["D3.js 지도 갱신\n+ 환경정보 패널\n+ 경보 알림"]
-    end
+**MIT License**
 
-    subgraph "Replay 모드"
-        E["MySQL\nsdot_nature_all"] -- "SQL Query" --> F["FastAPI"]
-        F -- "LRU Cache\n2,000 entries" --> F
-        F --> G["Browser\n시간축 재생"]
-    end
-```
-
-- **실시간 모드**: 브라우저가 서울시 API를 FastAPI 프록시 경유로 30초마다 호출
-- **Replay 모드**: 사용자가 날짜/시간 선택 시 FastAPI가 MySQL에서 조회 후 캐시
-
----
-
-## 라이선스
-
-MIT License
+</div>
