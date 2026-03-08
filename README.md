@@ -17,7 +17,7 @@
 
 <br>
 
-<img src="docs/dashboard-demo.gif" alt="대시보드 데모" width="720">
+<img src="docs/dashboard-preview.png" alt="대시보드 미리보기" width="720">
 
 </div>
 
