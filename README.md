@@ -17,7 +17,7 @@
 
 <br>
 
-<img src="docs/dashboard-preview.png" alt="대시보드 미리보기" width="720">
+<img src="docs/dashboard-demo.gif" alt="대시보드 데모" width="720">
 
 </div>
 
@@ -260,7 +260,43 @@ DB_NAME=sdot_db
 SDOT_API_KEY=your_seoul_api_key
 ```
 
-### 2. 로컬 실행
+### 2. 데이터베이스 설정
+
+```sql
+CREATE DATABASE sdot_db DEFAULT CHARACTER SET utf8mb4;
+
+-- 센서 측정 데이터
+CREATE TABLE sdot_nature_all (
+    시리얼 VARCHAR(20),
+    등록일시 DATETIME,
+    온도 FLOAT, 습도 FLOAT, 소음 FLOAT,
+    풍향 FLOAT, 풍속 FLOAT,
+    PM10 FLOAT, PM25 FLOAT,
+    -- 기타 17종 환경 지표 컬럼
+    INDEX idx_date (등록일시),
+    INDEX idx_serial (시리얼)
+);
+
+-- 센서 위치 정보
+CREATE TABLE sdot_sensor_locations (
+    시리얼 VARCHAR(20) PRIMARY KEY,
+    자치구 VARCHAR(20),
+    행정동 VARCHAR(30),
+    위도 DOUBLE,
+    경도 DOUBLE
+);
+
+-- 기상 관측소 (ASOS/AWS)
+CREATE TABLE weather_stations (
+    id VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(50),
+    type VARCHAR(10),  -- 'ASOS' 또는 'AWS'
+    lat DOUBLE,
+    lng DOUBLE
+);
+```
+
+### 3. 로컬 실행
 
 ```bash
 pip install -r requirements.txt
@@ -268,7 +304,7 @@ cd FastAPI && python replay_api.py
 # http://localhost:8000
 ```
 
-### 3. Docker 실행
+### 4. Docker 실행
 
 ```bash
 docker build -t sdot-dashboard .
