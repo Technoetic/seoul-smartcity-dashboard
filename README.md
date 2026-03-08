@@ -100,21 +100,6 @@ graph TB
 
 ---
 
-## 기술 스택
-
-<table>
-<tr>
-<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40"><br><b>JavaScript</b><br><sub>Vanilla ES6+</sub></td>
-<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/d3js/d3js-original.svg" width="40"><br><b>D3.js v7</b><br><sub>SVG 지도</sub></td>
-<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="40"><br><b>Python 3.11</b><br><sub>Backend</sub></td>
-<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="40"><br><b>FastAPI</b><br><sub>ASGI Server</sub></td>
-<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" width="40"><br><b>MySQL</b><br><sub>Database</sub></td>
-<td align="center" width="16%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="40"><br><b>Docker</b><br><sub>Container</sub></td>
-</tr>
-</table>
-
----
-
 ## 데이터 파이프라인
 
 ```mermaid
@@ -143,22 +128,6 @@ flowchart LR
 ---
 
 ## API 명세
-
-```mermaid
-graph LR
-    subgraph API["REST API Endpoints"]
-        direction TB
-        E1["GET /health"]
-        E2["GET /api/v1/sensors"]
-        E3["GET /api/v1/metadata"]
-        E4["GET /api/v1/replay"]
-        E5["GET /api/v1/replay/date-range"]
-        E6["GET /api/v1/sdot-proxy"]
-        E7["GET /api/v1/cache/stats"]
-    end
-
-    style API fill:#1a1a2e,stroke:#0f3460,color:#fff
-```
 
 | Endpoint | 설명 | 파라미터 | 캐시 TTL |
 |:---------|:-----|:---------|:---------|
@@ -314,6 +283,3 @@ cd FastAPI && python replay_api.py
 docker build -t sdot-dashboard .
 docker run -p 8000:8000 --env-file FastAPI/.env sdot-dashboard
 ```
-
----
-
