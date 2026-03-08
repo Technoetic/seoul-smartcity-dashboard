@@ -113,6 +113,58 @@ graph TB
 
 ---
 
+## 데이터베이스 관계도
+
+```mermaid
+erDiagram
+    sdot_nature_all {
+        int id PK "AUTO_INCREMENT"
+        varchar 시리얼 FK "센서 식별자"
+        varchar 자치구 "자치구명"
+        varchar 행정동 "행정동명"
+        float 온도_평균 "섭씨 온도"
+        float 습도_평균 "상대 습도 %"
+        datetime 등록일시 "측정 시각"
+    }
+
+    sdot_sensor_locations {
+        int id PK "AUTO_INCREMENT"
+        varchar 시리얼 UK "센서 고유 식별자"
+        varchar 주소 "설치 주소"
+        varchar 자치구 "자치구명"
+        varchar 행정동 "행정동명"
+        double 위도 "WGS84"
+        double 경도 "WGS84"
+        varchar 비고 "비고"
+    }
+
+    weather_stations {
+        int id PK "관측소 ID"
+        varchar name "관측소명"
+        varchar type "asos 또는 aws"
+        double lat "위도"
+        double lng "경도"
+    }
+
+    rtd_locations {
+        int id PK "AUTO_INCREMENT"
+        varchar area_nm "장소명"
+        varchar category "카테고리"
+        double lat "위도"
+        double lng "경도"
+        timestamp created_at "생성일시"
+    }
+
+    sdot_nature_all }o--|| sdot_sensor_locations : "시리얼"
+```
+
+> **관계 설명**
+> - `sdot_nature_all.시리얼` → `sdot_sensor_locations.시리얼` : 센서 측정 데이터가 센서 위치를 참조 (논리적 FK, N:1)
+> - `weather_stations` / `rtd_locations` : 독립 참조 테이블 — API 레이어(`routes.py`)에서 `sdot_sensor_locations`와 합쳐 통합 센서 목록으로 제공
+> - 물리적 FOREIGN KEY 제약은 미설정 (대량 INSERT 성능 우선)
+
+---
+
 ## 주요 기능
 
 ### 실시간 모니터링
