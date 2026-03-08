@@ -6,43 +6,10 @@
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-서울_스마트시티_대시보드-00d9ff?style=for-the-badge&logo=googlemaps&logoColor=white)](https://seoul-smartcity-dashboard.onrender.com/)
 
-<br>
 
-<a><img src="https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
-<a><img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"></a>
-<a><img src="https://img.shields.io/badge/D3.js-v7-F9A03C?style=flat-square&logo=d3dotjs&logoColor=white" alt="D3.js"></a>
-<a><img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white" alt="MySQL"></a>
-<a><img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"></a>
-<a><img src="https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white" alt="Render"></a>
+`Python 3.11` · `FastAPI` · `D3.js v7` · `MySQL` · `Docker` · `Render`
 
 </div>
-
----
-
-## 대시보드 미리보기
-
-<table>
-<tr>
-<td width="50%">
-
-**서울시 전체 뷰**
-
-온도 기반 5단계 히트맵으로 25개 자치구 시각화
-
-<img src=".claude/screenshots/full-check-v4.png" alt="서울시 전체 뷰" width="100%">
-
-</td>
-<td width="50%">
-
-**센서 레이어 ON**
-
-ASOS / AWS / RTD / S-DoT 센서 마커 오버레이
-
-<img src=".claude/screenshots/sensor-v9-on.png" alt="센서 레이어 ON" width="100%">
-
-</td>
-</tr>
-</table>
 
 ---
 
