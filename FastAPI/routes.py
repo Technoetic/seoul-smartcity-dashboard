@@ -375,13 +375,16 @@ async def get_replay_data(
                 logger.info(f"대체 시간 {best_hour}시 데이터 사용")
 
         # 5. 데이터 변환 (DB 행 → JSON 형식)
-        # 센서 위치 정보를 한 번에 조회하여 매핑
-        loc_map = {}
-        with get_db_connection() as conn2:
-            cursor2 = conn2.cursor()
-            cursor2.execute("SELECT 시리얼, 위도, 경도, 자치구, 행정동 FROM sdot_sensor_locations")
-            for loc in cursor2.fetchall():
-                loc_map[loc[0]] = {"lat": loc[1], "lng": loc[2], "cgg": loc[3], "dong": loc[4]}
+        # 센서 위치 정보 캐시 (1시간 유효)
+        loc_map = cache.get("sensor_loc_map", 3600)
+        if not loc_map:
+            loc_map = {}
+            with get_db_connection() as conn2:
+                cursor2 = conn2.cursor()
+                cursor2.execute("SELECT 시리얼, 위도, 경도, 자치구, 행정동 FROM sdot_sensor_locations")
+                for loc in cursor2.fetchall():
+                    loc_map[loc[0]] = {"lat": loc[1], "lng": loc[2], "cgg": loc[3], "dong": loc[4]}
+            cache.set("sensor_loc_map", loc_map)
 
         data = []
         for row in rows:
