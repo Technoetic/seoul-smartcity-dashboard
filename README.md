@@ -4,7 +4,7 @@
 
 **서울시 전역 1,200+ IoT 센서의 환경 데이터를 실시간 시각화하는 도시 모니터링 플랫폼**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-서울_스마트시티_대시보드-00d9ff?style=for-the-badge&logo=googlemaps&logoColor=white)](https://seoul-smartcity-dashboard.onrender.com/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-서울_스마트시티_대시보드-00d9ff?style=for-the-badge&logo=googlemaps&logoColor=white)](https://seoul-smartcity-dashboard-production.up.railway.app/)
 
 <br>
 
@@ -13,7 +13,7 @@
 ![D3.js](https://img.shields.io/badge/D3.js-v7-F9A03C?style=flat-square&logo=d3dotjs&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
-![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)
+![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)
 
 <br>
 
