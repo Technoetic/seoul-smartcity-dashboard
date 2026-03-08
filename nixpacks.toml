@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ["python311"]
-
-[phases.install]
-cmds = ["pip install -r FastAPI/requirements.txt"]
-
-[start]
-cmd = "cd FastAPI && python replay_api.py"
