@@ -317,8 +317,3 @@ docker run -p 8000:8000 --env-file FastAPI/.env sdot-dashboard
 
 ---
 
-<div align="center">
-
-**MIT License**
-
-</div>
