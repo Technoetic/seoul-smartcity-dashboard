@@ -73,7 +73,9 @@
 
         // Replay API 설정 (MySQL sdot_nature_all 연동)
         // 과거 센서 데이터를 DB에서 불러오기 위한 FastAPI 서버 설정
-        const REPLAY_API_BASE = `http://${location.hostname}:8000`; // 현재 호스트의 8000 포트 사용
+        const REPLAY_API_BASE = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+            ? `http://${location.hostname}:8000`  // 로컬 개발 환경
+            : `${location.protocol}//${location.host}`;  // 배포 환경 (Render 등)
         const replayApiConfig = {
             metadataLoaded: false,  // 메타데이터 로드 여부
             dateRange: {
