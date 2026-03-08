@@ -69,10 +69,6 @@ graph TB
 
 ## 주요 기능
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
 ### 실시간 모니터링
 
 | 기능 | 설명 |
@@ -83,9 +79,6 @@ graph TB
 | 📡 | ASOS / AWS / RTD / S-DoT **센서 레이어 토글** |
 | ⚠️ | PM2.5 등 **이상치 감지 경보** 알림 바 |
 | 🧭 | SVG **풍향 나침반** 애니메이션 |
-
-</td>
-<td width="50%" valign="top">
 
 ### Replay (과거 데이터 재생)
 
@@ -104,10 +97,6 @@ graph TB
 | 🔄 | 서울시 API **CORS 프록시** |
 | 📦 | LRU 캐시 **2,600 entries** |
 | 🔌 | DB 연결 풀 **최대 10 동시 연결** |
-
-</td>
-</tr>
-</table>
 
 ---
 
