@@ -383,6 +383,60 @@ docker run -p 8000:8000 --env-file FastAPI/.env sdot-dashboard
 
 이 프로젝트는 [Railway](https://railway.app/)에 호스팅되어 있습니다.
 
+#### 배포 파이프라인
+
+```mermaid
+flowchart LR
+    subgraph DEV["개발"]
+        A["💻 로컬 개발<br><i>코드 수정</i>"]
+    end
+
+    subgraph GITHUB["GitHub"]
+        B["📦 git push<br><i>master 브랜치</i>"]
+    end
+
+    subgraph RAILWAY["Railway"]
+        direction TB
+        C["🔍 Dockerfile 감지<br><i>자동 빌드 트리거</i>"]
+        D["🐳 Docker 빌드<br><i>python:3.11-slim</i>"]
+        E["⚙️ 환경변수 주입<br><i>DB · API Key · CORS</i>"]
+        F["🚀 배포 완료<br><i>.up.railway.app</i>"]
+        C --> D --> E --> F
+    end
+
+    A -- "git push" --> B
+    B -- "Webhook" --> C
+
+    style DEV fill:#1a1a2e,stroke:#53d769,color:#fff
+    style GITHUB fill:#1a1a2e,stroke:#e94560,color:#fff
+    style RAILWAY fill:#1a1a2e,stroke:#00d9ff,color:#fff
+```
+
+#### Railway 서비스 구성
+
+```mermaid
+graph TB
+    subgraph RAILWAY_PROJECT["Railway 프로젝트"]
+        direction TB
+        WEB["🌐 Web Service<br><b>FastAPI 서버</b><br><i>Dockerfile 기반</i><br>PORT 자동 할당"]
+        DB_EXT["🗄️ External MySQL<br><i>외부 DB 서버</i>"]
+    end
+
+    subgraph ENV_VARS["환경변수 (Variables 탭)"]
+        direction LR
+        V1["DB_HOST<br>DB_PORT<br>DB_USER<br>DB_PASSWORD<br>DB_NAME"]
+        V2["SDOT_API_KEY"]
+        V3["CORS_ORIGINS"]
+    end
+
+    USER["👤 사용자"] -- "https://...up.railway.app" --> WEB
+    ENV_VARS -. "주입" .-> WEB
+    WEB -- "PyMySQL" --> DB_EXT
+
+    style RAILWAY_PROJECT fill:#0d1b2a,stroke:#00d9ff,color:#e0e0e0
+    style ENV_VARS fill:#0d1b2a,stroke:#e94560,color:#e0e0e0
+```
+
 #### 배포 단계
 
 **1) GitHub 연결**
@@ -405,7 +459,7 @@ Railway 프로젝트의 **Variables** 탭에서 다음 환경변수를 추가합
 
 **3) 빌드 & 배포**
 
-Railway는 Dockerfile을 자동 감지하여 빌드합니다. 별도의 빌드 설정 없이 `main` 브랜치에 push하면 자동 배포됩니다.
+Railway는 Dockerfile을 자동 감지하여 빌드합니다. 별도의 빌드 설정 없이 `master` 브랜치에 push하면 자동 배포됩니다.
 
 - **빌드**: `Dockerfile` 기반 (python:3.11-slim)
 - **포트**: Railway가 `PORT` 환경변수를 자동 주입하며, FastAPI 서버가 해당 포트에서 리슨
