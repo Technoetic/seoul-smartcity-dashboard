@@ -51,11 +51,15 @@ DB_CONFIG = {
     'password': os.getenv('DB_PASSWORD', ''),  # 데이터베이스 비밀번호 (.env에서 관리)
     'database': os.getenv('DB_NAME', 'sdot_db'),  # 사용할 데이터베이스 이름
     'charset': 'utf8mb4',  # 문자 인코딩 (utf8mb4: 한글, 이모지 등 모든 문자 지원)
-    'auth_plugin_map': {  # 인증 방식 설정 (MySQL 버전 호환성)
-        'mysql_native_password': 'mysql_native_password',
-        'auth_gssapi_client': 'mysql_native_password'
-    }
 }
+
+# 외부 DB(Railway 등) 연결 시 SSL 설정
+if os.getenv('DB_HOST', '127.0.0.1') not in ('127.0.0.1', 'localhost'):
+    import ssl
+    ssl_ctx = ssl.create_default_context()
+    ssl_ctx.check_hostname = False
+    ssl_ctx.verify_mode = ssl.CERT_NONE
+    DB_CONFIG['ssl'] = ssl_ctx
 
 # === TTL 설정 (초 단위) ===
 # TTL(Time To Live): 캐시 데이터가 유효한 시간
