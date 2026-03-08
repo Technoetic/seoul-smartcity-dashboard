@@ -86,6 +86,7 @@ graph TB
         T1[("sdot_nature_all<br><i>센서 측정 데이터</i>")]
         T2[("sdot_sensor_locations<br><i>센서 위치</i>")]
         T3[("weather_stations<br><i>기상 관측소</i>")]
+        T4[("rtd_locations<br><i>RTD 관측 위치</i>")]
     end
 
     subgraph CLIENT["브라우저"]
@@ -297,6 +298,15 @@ CREATE TABLE weather_stations (
     id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(50),
     type VARCHAR(10),  -- 'ASOS' 또는 'AWS'
+    lat DOUBLE,
+    lng DOUBLE
+);
+
+-- RTD 실시간 도시데이터 관측 위치
+CREATE TABLE rtd_locations (
+    id VARCHAR(10) PRIMARY KEY,
+    area_nm VARCHAR(50),
+    category VARCHAR(30),
     lat DOUBLE,
     lng DOUBLE
 );
