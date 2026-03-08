@@ -12,55 +12,50 @@
 
 ## 시스템 구성도
 
-```
-┌─ Browser ──────────────────────────────────────────────────────────┐
-│                                                                     │
-│  index.html ── D3.js (SVG 지도 렌더링)                              │
-│       │                                                             │
-│  ┌────┴────────────────────────────────────────────────┐            │
-│  │  config.js    GeoJSON URL, 자치구 코드, 전역 상태     │            │
-│  │  api.js       서울시 Open API 프록시 호출             │            │
-│  │  map.js       구 경계선 SVG 렌더링 + 온도 색상 매핑    │            │
-│  │  dong-*.js    동 단위 확대/오버레이/마커               │            │
-│  │  sensor-*.js  ASOS/AWS/RTD/S-DoT 마커 레이어          │            │
-│  │  replay-*.js  과거 데이터 시간축 재생 UI/로직           │            │
-│  │  anomaly.js   이상치 감지 + 경보 알림                  │            │
-│  │  wind.js      풍향 나침반 SVG 애니메이션               │            │
-│  └────┬────────────────────────────────────────────────┘            │
-│       │ fetch()                                                     │
-└───────┼─────────────────────────────────────────────────────────────┘
-        │
-        ▼
-┌─ FastAPI (Python) ──────────────────────────────────────────────────┐
-│                                                                      │
-│  replay_api.py ── 메인 서버 (정적 파일 서빙 + API 라우팅)              │
-│       │                                                              │
-│  ┌────┴──────────────────────────────────────────────┐               │
-│  │  routes.py    /api/v1/sensors       센서 위치 조회   │               │
-│  │               /api/v1/replay        시간대별 데이터   │               │
-│  │               /api/v1/metadata      데이터 범위 정보  │               │
-│  │               /api/v1/sdot-proxy    서울시 API 프록시 │               │
-│  │               /api/v1/cache/*       캐시 관리         │               │
-│  │  database.py  PooledDB 연결 풀 (pymysql)             │               │
-│  │  cache.py     LRU 캐시 (TTL: 오늘 5분 / 과거 7일)    │               │
-│  │  config.py    환경변수 로드 + 로깅                    │               │
-│  └───────────────────────────────────────────────────┘               │
-│       │                                                              │
-└───────┼──────────────────────────────────────────────────────────────┘
-        │
-        ▼
-┌─ MySQL ─────────────────────────────────────────────────────────────┐
-│  sdot_nature_all        센서 측정 데이터 (온도, 습도, 등록일시)         │
-│  sdot_sensor_locations  센서 설치 위치 (위도, 경도, 자치구, 행정동)      │
-│  weather_stations       기상 관측소 위치 (ASOS, AWS)                   │
-│  rtd_locations          실시간 도시데이터 관측 지점                      │
-└─────────────────────────────────────────────────────────────────────┘
-        │
-        ▼
-┌─ External API ──────────────────────────────────────────────────────┐
-│  서울시 S-DoT Open API (IotVdata017) ── 실시간 센서 데이터 (30초 주기) │
-│  GitHub Raw (southkorea/seoul-maps) ── 구/동 GeoJSON 경계선 데이터    │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph Browser
+        HTML["index.html + D3.js SVG"]
+        subgraph Frontend Modules
+            CONFIG["config.js — API URL, 자치구 코드"]
+            API["api.js — Open API 프록시 호출"]
+            MAP["map.js — 구 경계선 렌더링"]
+            DONG["dong-*.js — 동 확대/오버레이"]
+            SENSOR["sensor-*.js — ASOS/AWS/RTD/S-DoT 마커"]
+            REPLAY_FE["replay-*.js — 시간축 재생 UI"]
+            ANOMALY["anomaly.js — 이상치 감지 경보"]
+            WIND["wind.js — 풍향 나침반"]
+        end
+        HTML --> CONFIG & API & MAP & DONG & SENSOR & REPLAY_FE & ANOMALY & WIND
+    end
+
+    subgraph FastAPI
+        MAIN["replay_api.py — 메인 서버"]
+        subgraph Modules
+            ROUTES["routes.py — /sensors, /replay, /metadata, /sdot-proxy"]
+            DB["database.py — PooledDB 연결 풀"]
+            CACHE["cache.py — LRU 캐시 (TTL 기반)"]
+            CONF["config.py — 환경변수, 로깅"]
+        end
+        MAIN --> ROUTES & DB & CACHE & CONF
+    end
+
+    subgraph MySQL
+        T1["sdot_nature_all — 센서 측정 데이터"]
+        T2["sdot_sensor_locations — 센서 위치"]
+        T3["weather_stations — 기상 관측소"]
+        T4["rtd_locations — 도시데이터 관측 지점"]
+    end
+
+    subgraph External
+        SDOT_API["서울시 S-DoT Open API — 실시간 30초 주기"]
+        GEOJSON["GitHub Raw — 구/동 GeoJSON"]
+    end
+
+    Browser -- "fetch()" --> FastAPI
+    FastAPI -- "SQL Query" --> MySQL
+    FastAPI -- "CORS Proxy" --> SDOT_API
+    Browser -- "GeoJSON Fetch" --> GEOJSON
 ```
 
 ---
@@ -217,22 +212,19 @@ docker run -p 8000:8000 --env-file FastAPI/.env sdot-dashboard
 
 ## 데이터 파이프라인
 
-```
-서울시 S-DoT Open API ──(30초 주기 fetch)──▶ Browser
-                                              │
-                                              ▼
-                                     apiDataCache (메모리)
-                                              │
-                                              ▼
-                                     D3.js SVG 지도 색상 업데이트
-                                     + 환경정보 패널 갱신
-                                     + 경보 알림 판정
+```mermaid
+flowchart LR
+    subgraph "실시간 모드"
+        A["서울시 S-DoT API"] -- "30초 주기" --> B["FastAPI Proxy"]
+        B --> C["Browser Cache"]
+        C --> D["D3.js 지도 갱신\n+ 환경정보 패널\n+ 경보 알림"]
+    end
 
-
-MySQL sdot_nature_all ──(Replay API)──▶ FastAPI ──▶ Browser
-                                          │
-                                     LRU Cache
-                                     (2,000 entries, TTL 기반)
+    subgraph "Replay 모드"
+        E["MySQL\nsdot_nature_all"] -- "SQL Query" --> F["FastAPI"]
+        F -- "LRU Cache\n2,000 entries" --> F
+        F --> G["Browser\n시간축 재생"]
+    end
 ```
 
 - **실시간 모드**: 브라우저가 서울시 API를 FastAPI 프록시 경유로 30초마다 호출
