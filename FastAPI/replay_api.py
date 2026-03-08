@@ -123,27 +123,6 @@ app.mount("/js", StaticFiles(directory=os.path.join(FRONT_DIR, "js")), name="js"
 app.include_router(router)
 
 
-# === 디버그: DB 연결 테스트 ===
-@app.get("/debug/db")
-async def debug_db():
-    import traceback
-    from config import DB_CONFIG
-    result = {"db_config": {k: v for k, v in DB_CONFIG.items() if k != 'password'}, "db_pool": str(db_pool) if 'db_pool' in dir() else "N/A"}
-    try:
-        from database import db_pool as pool
-        result["pool_status"] = "initialized" if pool else "None"
-        if pool:
-            with get_db_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute("SELECT 1")
-                result["connection"] = "OK"
-                cursor.close()
-    except Exception as e:
-        result["error"] = str(e)
-        result["traceback"] = traceback.format_exc()
-    return result
-
-
 # === 대시보드 메인 페이지 ===
 @app.get("/", response_class=FileResponse)
 async def serve_dashboard():
