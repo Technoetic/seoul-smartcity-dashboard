@@ -327,11 +327,11 @@ async def get_replay_data(
                     b.행정동 as 행정동_한글
                 FROM sdot_nature_all a  -- 센서 데이터 테이블
                 LEFT JOIN sdot_sensor_locations b ON a.시리얼 = b.시리얼  -- 위치 정보와 조인
-                WHERE DATE(a.등록일시) = %s  -- 날짜 필터
-                  AND HOUR(a.등록일시) = %s  -- 시간 필터
+                WHERE a.등록일시 >= CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00')
+                  AND a.등록일시 < CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00') + INTERVAL 1 HOUR
                 ORDER BY a.시리얼  -- 센서 ID 순으로 정렬
                 LIMIT 100000  -- 최대 10만 건 (과도한 데이터 방지)
-            """, (date, hour))
+            """, (date, hour, date, hour))
             rows = cursor.fetchall()  # 모든 결과 가져오기
 
         # 4. 데이터가 없는 경우 인접 시간대 탐색 (단일 쿼리로 최적화)
@@ -344,9 +344,10 @@ async def get_replay_data(
                 cursor.execute("""
                     SELECT HOUR(등록일시) as h, COUNT(*) as cnt
                     FROM sdot_nature_all
-                    WHERE DATE(등록일시) = %s
+                    WHERE 등록일시 >= CONCAT(%s, ' 00:00:00')
+                      AND 등록일시 < CONCAT(%s, ' 00:00:00') + INTERVAL 1 DAY
                     GROUP BY HOUR(등록일시)
-                """, (date,))
+                """, (date, date))
                 available_hours = {row[0]: row[1] for row in cursor.fetchall()}
 
             # 가장 가까운 시간대 찾기 (±12시간)
@@ -375,10 +376,11 @@ async def get_replay_data(
                             b.행정동 as 행정동_한글
                         FROM sdot_nature_all a
                         LEFT JOIN sdot_sensor_locations b ON a.시리얼 = b.시리얼
-                        WHERE DATE(a.등록일시) = %s AND HOUR(a.등록일시) = %s
+                        WHERE a.등록일시 >= CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00')
+                          AND a.등록일시 < CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00') + INTERVAL 1 HOUR
                         ORDER BY a.시리얼
                         LIMIT 100000
-                    """, (date, best_hour))
+                    """, (date, best_hour, date, best_hour))
                     rows = cursor.fetchall()
                 logger.info(f"대체 시간 {best_hour}시 데이터 사용")
 
@@ -467,7 +469,8 @@ async def get_available_dates(
             cursor.execute("""
                 SELECT DISTINCT DATE(등록일시) as date
                 FROM sdot_nature_all
-                WHERE DATE(등록일시) BETWEEN %s AND %s  -- 날짜 범위 필터
+                WHERE 등록일시 >= CONCAT(%s, ' 00:00:00')
+                  AND 등록일시 < CONCAT(%s, ' 00:00:00') + INTERVAL 1 DAY
                 ORDER BY date  -- 날짜 순으로 정렬
             """, (start, end))
             rows = cursor.fetchall()
