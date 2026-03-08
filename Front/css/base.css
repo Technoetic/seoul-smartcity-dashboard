@@ -1,0 +1,57 @@
+/* 모든 HTML 요소의 기본 여백과 패딩 제거 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;  /* 테두리를 포함한 크기 계산 */
+}
+
+/* CSS 변수 정의: 전체 사이트에서 사용되는 색상과 스타일 */
+:root {
+    /* 배경 색상 */
+    --bg-primary: #1a1a2e;       /* 메인 배경 (가장 어두운 남색) */
+    --bg-secondary: #16213e;     /* 보조 배경 (중간 어두운 남색) */
+    --bg-tertiary: #0f3460;      /* 3차 배경 (밝은 남색, 버튼 등) */
+
+    /* 텍스트 색상 */
+    --text-primary: #e8e8e8;     /* 주요 텍스트 (밝은 회색) */
+    --text-secondary: #a0a0a0;   /* 보조 텍스트 (어두운 회색) */
+
+    /* 강조 색상 */
+    --accent: #00d9ff;           /* 주요 강조 색상 (청록색, 제목/테두리) */
+    --success: #00b894;          /* 성공/정상 상태 (초록색) */
+    --warning: #fdcb6e;          /* 경고 상태 (노란색) */
+    --danger: #e17055;           /* 위험 상태 (주황색) */
+    --critical: #d63031;         /* 심각한 위험 (빨간색) */
+
+    /* 온도 구간별 색상 */
+    --color-cold: #3498db;       /* 영하/추움 (파란색) */
+    --color-cool: #00d9ff;       /* 서늘함 (청록색) */
+    --color-good: #2ecc71;       /* 쾌적함 (초록색) */
+    --color-bad: #f39c12;        /* 더움 (주황색) */
+    --color-danger-alt: #e74c3c; /* 폭염 (빨간색) */
+    --color-neutral: #7f8c8d;    /* 데이터 없음 (회색) */
+
+    /* 지도 및 특수 색상 */
+    --color-district-bg: #243552;  /* 구/동 배경 색상 */
+    --color-replay: #9b59b6;       /* Replay 모드 색상 (보라색) */
+
+    /* 패널 스타일 */
+    --bg-panel: rgba(22, 33, 62, 0.95);  /* 패널 배경 (반투명 남색) */
+    --shadow-panel: 0 4px 20px rgba(0, 0, 0, 0.3);  /* 패널 그림자 */
+}
+
+/* 키보드 포커스 스타일 (접근성) */
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* 기본 body 스타일 */
+body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;  /* 한글 폰트 우선 */
+    background: var(--bg-primary);  /* 어두운 배경 */
+    color: var(--text-primary);     /* 밝은 텍스트 */
+    min-height: 100vh;              /* 최소 화면 전체 높이 */
+    display: flex;
+    flex-direction: column;         /* 세로 방향 레이아웃 */
+}

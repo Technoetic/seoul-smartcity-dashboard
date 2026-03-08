@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S-DoT - 서울을 읽는 1,100개의 눈</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --color-bg: #F8F9FA;
+            --color-bg-dark: #E9ECEF;
+            --color-primary: #1E3A5F;
+            --color-asos: #6C757D;
+            --color-aws: #0077B6;
+            --color-sdot: #00B4D8;
+            --color-accent: #FF6B35;
+            --color-text: #212529;
+            --color-text-light: #6C757D;
+            --color-white: #FFFFFF;
+
+            --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-normal: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== Reset & Base ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        /* ===== Presentation Container ===== */
+        .presentation {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slides-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* ===== Slide Base ===== */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            background: var(--color-bg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(50px);
+            transition: all var(--transition-normal);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .slide-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        /* ===== Slide 1: Title ===== */
+        #slide-1 {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #2C5282 100%);
+        }
+
+        .title-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 2rem;
+        }
+
+        .title-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .main-title {
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--color-white);
+            letter-spacing: -2px;
+            margin-bottom: 1rem;
+        }
+
+        .main-subtitle {
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: var(--color-sdot);
+            margin-bottom: 2rem;
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            color: rgba(255,255,255,0.7);
+            padding: 0.8rem 2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 30px;
+        }
+
+        /* ===== Slide 2: Problem ===== */
+        .problem-visual {
+            position: relative;
+            width: 400px;
+            height: 300px;
+            margin: 2rem 0;
+        }
+
+        .seoul-outline {
+            width: 100%;
+            height: 100%;
+        }
+
+        .single-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background: var(--color-asos);
+            border-radius: 50%;
+            box-shadow: 0 0 0 10px rgba(108, 117, 125, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 10px rgba(108, 117, 125, 0.3); }
+            50% { box-shadow: 0 0 0 20px rgba(108, 117, 125, 0.1); }
+        }
+
+        .question-mark {
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            font-size: 5rem;
+            color: var(--color-accent);
+            font-weight: 900;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            color: var(--color-text-light);
+            font-style: italic;
+        }
+
+        /* ===== Slide 3 & 4: ASOS & AWS ===== */
+        .system-card {
+            background: var(--color-white);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .system-card.asos { border-top: 5px solid var(--color-asos); }
+        .system-card.aws { border-top: 5px solid var(--color-aws); }
+
+        .system-label {
+            display: inline-block;
+            font-size: 1rem;
+            color: var(--color-text-light);
+            background: var(--color-bg);
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-top: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number.asos { color: var(--color-asos); }
+        .stat-number.aws { color: var(--color-aws); }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--color-text-light);
+        }
+
+        /* ===== Slide 5: S-DoT ===== */
+        #slide-5 {
+            background: linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%);
+        }
+
+        #slide-5 .slide-title {
+            color: var(--color-primary);
+        }
+
+        .sdot-highlight {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .big-number {
+            font-size: 8rem;
+            font-weight: 900;
+            color: var(--color-sdot);
+            line-height: 1;
+            text-shadow: 0 4px 20px rgba(0, 180, 216, 0.3);
+        }
+
+        .big-number-unit {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-left: 0.5rem;
+        }
+
+        .highlight-text {
+            font-size: 1.5rem;
+            color: var(--color-text-light);
+            margin-top: 1rem;
+        }
+
+        .feature-badges {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            background: var(--color-white);
+            color: var(--color-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* ===== Slide 6: Comparison Table ===== */
+        .comparison-table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            background: var(--color-white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .comparison-table thead {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .comparison-table th {
+            font-weight: 600;
+        }
+
+        .comparison-table tbody tr {
+            border-bottom: 1px solid var(--color-bg);
+            transition: background 0.2s;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: var(--color-bg);
+        }
+
+        .comparison-table .row-asos td:first-child { color: var(--color-asos); font-weight: 700; }
+        .comparison-table .row-aws td:first-child { color: var(--color-aws); font-weight: 700; }
+        .comparison-table .row-sdot {
+            background: linear-gradient(90deg, rgba(0, 180, 216, 0.1) 0%, transparent 100%);
+        }
+        .comparison-table .row-sdot td:first-child { color: var(--color-sdot); font-weight: 700; }
+        .comparison-table .row-sdot td { font-weight: 600; }
+
+        .comparison-table strong {
+            color: var(--color-sdot);
+            font-size: 1.4rem;
+        }
+
+        /* ===== Slide 7: Visual Comparison ===== */
+        .visual-comparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .comparison-column {
+            background: var(--color-white);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .comparison-column:hover {
+            transform: translateY(-10px);
+        }
+
+        .comparison-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .comparison-column.asos h3 { color: var(--color-asos); }
+        .comparison-column.aws h3 { color: var(--color-aws); }
+        .comparison-column.sdot h3 { color: var(--color-sdot); }
+
+        .dot-container {
+            min-height: 150px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dotAppear 0.3s ease forwards;
+        }
+
+        .dot.asos { background: var(--color-asos); width: 30px; height: 30px; }
+        .dot.aws { background: var(--color-aws); }
+        .dot.sdot { background: var(--color-sdot); width: 6px; height: 6px; }
+
+        @keyframes dotAppear {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .count {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            color: var(--color-text);
+        }
+
+        /* ===== Slide 8: Data Types ===== */
+        .data-categories {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .category {
+            background: var(--color-white);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .category h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--color-bg);
+        }
+
+        .category.air h3 { color: #e74c3c; }
+        .category.weather h3 { color: #3498db; }
+        .category.environment h3 { color: #27ae60; }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .data-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+        }
+
+        .data-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* ===== Slide 9: Use Cases ===== */
+        .use-cases {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .case-card {
+            background: var(--color-white);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .case-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .case-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: var(--color-bg);
+            border-radius: 50%;
+        }
+
+        .case-card h3 {
+            font-size: 1.3rem;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .case-card p {
+            font-size: 1rem;
+            color: var(--color-text-light);
+        }
+
+        /* ===== Slide 10: Conclusion ===== */
+        #slide-10 {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #2C5282 100%);
+        }
+
+        #slide-10 .slide-title {
+            color: var(--color-white);
+            font-size: 2.5rem;
+        }
+
+        .summary-points {
+            display: flex;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .point {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .point-number {
+            display: block;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--color-sdot);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .point-text {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--color-sdot);
+            color: var(--color-white);
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 2rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.4);
+        }
+
+        /* ===== Navigation ===== */
+        .slide-nav {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.8rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-dot:hover {
+            background: rgba(0,0,0,0.4);
+        }
+
+        .nav-dot.active {
+            background: var(--color-sdot);
+            transform: scale(1.3);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 1rem;
+            color: var(--color-text-light);
+            z-index: 100;
+        }
+
+        /* ===== Arrow Navigation ===== */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .nav-arrow:hover {
+            background: var(--color-white);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.prev { left: 2rem; }
+        .nav-arrow.next { right: 2rem; }
+
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ===== Progress Bar ===== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--color-sdot);
+            transition: width 0.3s;
+            z-index: 100;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 1024px) {
+            .slide { padding: 2rem; }
+            .slide-title { font-size: 2.2rem; }
+            .main-title { font-size: 4rem; }
+            .big-number { font-size: 6rem; }
+            .visual-comparison,
+            .data-categories,
+            .use-cases { grid-template-columns: 1fr; max-width: 500px; }
+            .summary-points { flex-direction: column; gap: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .slide-title { font-size: 1.8rem; }
+            .main-title { font-size: 3rem; }
+            .main-subtitle { font-size: 1.5rem; }
+            .big-number { font-size: 4rem; }
+            .stats-row { flex-direction: column; gap: 2rem; }
+            .nav-arrow { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+
+    <div class="presentation">
+        <div class="slides-container">
+            <!-- Slide 1: Title -->
+            <section class="slide active" id="slide-1" role="region" aria-label="타이틀 슬라이드">
+                <div class="title-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#00B4D8" stroke-width="3"/>
+                        <circle cx="50" cy="50" r="12" fill="#00B4D8"/>
+                        <circle cx="50" cy="15" r="5" fill="#00B4D8"/>
+                        <circle cx="50" cy="85" r="5" fill="#00B4D8"/>
+                        <circle cx="15" cy="50" r="5" fill="#00B4D8"/>
+                        <circle cx="85" cy="50" r="5" fill="#00B4D8"/>
+                        <circle cx="25" cy="25" r="4" fill="#00B4D8" opacity="0.6"/>
+                        <circle cx="75" cy="25" r="4" fill="#00B4D8" opacity="0.6"/>
+                        <circle cx="25" cy="75" r="4" fill="#00B4D8" opacity="0.6"/>
+                        <circle cx="75" cy="75" r="4" fill="#00B4D8" opacity="0.6"/>
+                    </svg>
+                </div>
+                <h1 class="main-title">S-DoT</h1>
+                <p class="main-subtitle">서울을 읽는 1,100개의 눈</p>
+                <p class="tagline">스마트서울 도시데이터 센서</p>
+            </section>
+
+            <!-- Slide 2: Problem -->
+            <section class="slide" id="slide-2" role="region" aria-label="문제 제기">
+                <h2 class="slide-title">서울의 날씨, 정말 '서울' 날씨일까?</h2>
+                <div class="problem-visual">
+                    <svg class="seoul-outline" viewBox="0 0 400 300" fill="none">
+                        <path d="M80 150 Q100 80, 180 60 Q260 40, 320 80 Q360 120, 340 180 Q320 240, 240 260 Q160 280, 100 240 Q60 200, 80 150Z"
+                              fill="#E9ECEF" stroke="#CED4DA" stroke-width="2"/>
+                        <text x="200" y="290" text-anchor="middle" fill="#6C757D" font-size="14">서울시 (605km²)</text>
+                    </svg>
+                    <div class="single-marker"></div>
+                    <span class="question-mark">?</span>
+                </div>
+                <p class="question-text">"강남과 노원의 기온이 같을까?"</p>
+            </section>
+
+            <!-- Slide 3: ASOS -->
+            <section class="slide" id="slide-3" role="region" aria-label="ASOS 소개">
+                <h2 class="slide-title">기존 시스템 ① ASOS</h2>
+                <div class="system-card asos">
+                    <span class="system-label">종관기상관측시스템 (Automated Synoptic Observing System)</span>
+                    <div class="stats-row">
+                        <div class="stat">
+                            <span class="stat-number asos">~100</span>
+                            <span class="stat-label">전국 관측소</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number asos">1~2</span>
+                            <span class="stat-label">서울 관측소</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: AWS -->
+            <section class="slide" id="slide-4" role="region" aria-label="AWS 소개">
+                <h2 class="slide-title">기존 시스템 ② AWS</h2>
+                <div class="system-card aws">
+                    <span class="system-label">자동기상관측장비 (Automatic Weather Station)</span>
+                    <div class="stats-row">
+                        <div class="stat">
+                            <span class="stat-number aws">~500</span>
+                            <span class="stat-label">전국 관측소</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number aws">10~15</span>
+                            <span class="stat-label">서울 관측소</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: S-DoT -->
+            <section class="slide" id="slide-5" role="region" aria-label="S-DoT 소개">
+                <h2 class="slide-title">새로운 솔루션: S-DoT</h2>
+                <div class="sdot-highlight">
+                    <span class="big-number">1,100</span><span class="big-number-unit">개</span>
+                    <p class="highlight-text">서울시 전역에 설치된 스마트 센서</p>
+                </div>
+                <div class="feature-badges">
+                    <span class="badge">2분마다 실시간 측정</span>
+                    <span class="badge">17종 환경 데이터</span>
+                    <span class="badge">500m 간격 배치</span>
+                </div>
+            </section>
+
+            <!-- Slide 6: Comparison Table -->
+            <section class="slide" id="slide-6" role="region" aria-label="공간해상도 비교">
+                <h2 class="slide-title">얼마나 촘촘할까?</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>시스템</th>
+                            <th>서울 관측점</th>
+                            <th>평균 거리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="row-asos">
+                            <td>ASOS</td>
+                            <td>1~2개</td>
+                            <td>-</td>
+                        </tr>
+                        <tr class="row-aws">
+                            <td>AWS</td>
+                            <td>10~15개</td>
+                            <td>4~6km</td>
+                        </tr>
+                        <tr class="row-sdot">
+                            <td>S-DoT</td>
+                            <td>1,100개</td>
+                            <td><strong>500m</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Slide 7: Visual Comparison -->
+            <section class="slide" id="slide-7" role="region" aria-label="시각적 비교">
+                <h2 class="slide-title">한눈에 보는 차이</h2>
+                <div class="visual-comparison">
+                    <div class="comparison-column asos">
+                        <h3>ASOS</h3>
+                        <div class="dot-container" id="dots-asos">
+                            <!-- JS로 생성 -->
+                        </div>
+                        <p class="count">1개소</p>
+                    </div>
+                    <div class="comparison-column aws">
+                        <h3>AWS</h3>
+                        <div class="dot-container" id="dots-aws">
+                            <!-- JS로 생성 -->
+                        </div>
+                        <p class="count">~10개소</p>
+                    </div>
+                    <div class="comparison-column sdot">
+                        <h3>S-DoT</h3>
+                        <div class="dot-container" id="dots-sdot">
+                            <!-- JS로 생성 -->
+                        </div>
+                        <p class="count">1,100개소</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 8: Data Types -->
+            <section class="slide" id="slide-8" role="region" aria-label="수집 데이터">
+                <h2 class="slide-title">S-DoT이 측정하는 17가지</h2>
+                <div class="data-categories">
+                    <div class="category air">
+                        <h3>대기질 (8종)</h3>
+                        <div class="icon-grid">
+                            <div class="data-item"><span class="data-icon">💨</span> 미세먼지</div>
+                            <div class="data-item"><span class="data-icon">🌫️</span> 초미세먼지</div>
+                            <div class="data-item"><span class="data-icon">⚗️</span> 일산화탄소</div>
+                            <div class="data-item"><span class="data-icon">🧪</span> 이산화황</div>
+                            <div class="data-item"><span class="data-icon">🔬</span> 이산화질소</div>
+                            <div class="data-item"><span class="data-icon">💧</span> 암모니아</div>
+                            <div class="data-item"><span class="data-icon">⚠️</span> 황화수소</div>
+                            <div class="data-item"><span class="data-icon">☀️</span> 오존</div>
+                        </div>
+                    </div>
+                    <div class="category weather">
+                        <h3>기상 (5종)</h3>
+                        <div class="icon-grid">
+                            <div class="data-item"><span class="data-icon">🌡️</span> 온도</div>
+                            <div class="data-item"><span class="data-icon">💧</span> 습도</div>
+                            <div class="data-item"><span class="data-icon">🧭</span> 풍향</div>
+                            <div class="data-item"><span class="data-icon">💨</span> 풍속</div>
+                            <div class="data-item"><span class="data-icon">🔥</span> 흑구온도</div>
+                        </div>
+                    </div>
+                    <div class="category environment">
+                        <h3>환경 (4종)</h3>
+                        <div class="icon-grid">
+                            <div class="data-item"><span class="data-icon">🔊</span> 소음</div>
+                            <div class="data-item"><span class="data-icon">☀️</span> 자외선</div>
+                            <div class="data-item"><span class="data-icon">📳</span> 진동</div>
+                            <div class="data-item"><span class="data-icon">💡</span> 조도</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 9: Use Cases -->
+            <section class="slide" id="slide-9" role="region" aria-label="활용 사례">
+                <h2 class="slide-title">S-DoT 데이터는 어디에 쓰일까?</h2>
+                <div class="use-cases">
+                    <div class="case-card">
+                        <div class="case-icon">🏙️</div>
+                        <h3>도시 열섬 분석</h3>
+                        <p>동 단위 기온 차이 파악으로<br>열섬 현상 정밀 모니터링</p>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-icon">🌫️</div>
+                        <h3>미세먼지 핫스팟</h3>
+                        <p>오염원 위치 정밀 추적으로<br>맞춤형 저감 정책 수립</p>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-icon">🌡️</div>
+                        <h3>폭염 취약성 평가</h3>
+                        <p>행정동별 폭염 위험도 분석으로<br>취약계층 보호 정책 지원</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 10: Conclusion -->
+            <section class="slide" id="slide-10" role="region" aria-label="결론">
+                <h2 class="slide-title">내 동네 환경, 이제 정확히 알 수 있습니다</h2>
+                <div class="summary-points">
+                    <div class="point">
+                        <span class="point-number">100x</span>
+                        <span class="point-text">기존 대비 높은 밀도</span>
+                    </div>
+                    <div class="point">
+                        <span class="point-number">500m</span>
+                        <span class="point-text">촘촘한 관측망</span>
+                    </div>
+                    <div class="point">
+                        <span class="point-number">17종</span>
+                        <span class="point-text">복합 환경 데이터</span>
+                    </div>
+                </div>
+                <a href="https://data.seoul.go.kr" class="cta-button" target="_blank" rel="noopener">
+                    열린데이터광장에서 확인하기 →
+                </a>
+            </section>
+        </div>
+
+        <!-- Navigation -->
+        <button class="nav-arrow prev" id="prevBtn" aria-label="이전 슬라이드">←</button>
+        <button class="nav-arrow next" id="nextBtn" aria-label="다음 슬라이드">→</button>
+
+        <nav class="slide-nav" role="navigation" aria-label="슬라이드 네비게이션" id="slideNav">
+            <!-- JS로 생성 -->
+        </nav>
+
+        <div class="slide-counter" id="counter">1 / 10</div>
+    </div>
+
+    <script>
+        class Presentation {
+            constructor() {
+                this.currentSlide = 0;
+                this.totalSlides = 10;
+                this.slides = document.querySelectorAll('.slide');
+                this.navContainer = document.getElementById('slideNav');
+                this.counter = document.getElementById('counter');
+                this.progress = document.getElementById('progress');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.createDotVisualizations();
+                this.bindEvents();
+                this.updateUI();
+            }
+
+            createNavDots() {
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', `슬라이드 ${i + 1}로 이동`);
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    this.navContainer.appendChild(dot);
+                }
+            }
+
+            createDotVisualizations() {
+                // ASOS: 1 dot
+                const asosContainer = document.getElementById('dots-asos');
+                const asosDot = document.createElement('span');
+                asosDot.className = 'dot asos';
+                asosDot.style.animationDelay = '0.1s';
+                asosContainer.appendChild(asosDot);
+
+                // AWS: 10 dots
+                const awsContainer = document.getElementById('dots-aws');
+                for (let i = 0; i < 10; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'dot aws';
+                    dot.style.animationDelay = `${i * 0.05}s`;
+                    awsContainer.appendChild(dot);
+                }
+
+                // S-DoT: 100 dots (representing 1100)
+                const sdotContainer = document.getElementById('dots-sdot');
+                for (let i = 0; i < 100; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'dot sdot';
+                    dot.style.animationDelay = `${i * 0.01}s`;
+                    sdotContainer.appendChild(dot);
+                }
+            }
+
+            bindEvents() {
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case 'ArrowRight':
+                        case 'ArrowDown':
+                        case ' ':
+                            e.preventDefault();
+                            this.next();
+                            break;
+                        case 'ArrowLeft':
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            this.prev();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+
+                // Touch/Swipe navigation
+                let touchStartX = 0;
+                let touchStartY = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+                    const diffX = touchStartX - touchEndX;
+                    const diffY = touchStartY - touchEndY;
+
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                        if (diffX > 0) {
+                            this.next();
+                        } else {
+                            this.prev();
+                        }
+                    }
+                }, { passive: true });
+
+                // Button navigation
+                this.prevBtn.addEventListener('click', () => this.prev());
+                this.nextBtn.addEventListener('click', () => this.next());
+
+                // Mouse wheel (optional)
+                let wheelTimeout;
+                document.addEventListener('wheel', (e) => {
+                    if (wheelTimeout) return;
+                    wheelTimeout = setTimeout(() => {
+                        wheelTimeout = null;
+                    }, 500);
+
+                    if (e.deltaY > 0) {
+                        this.next();
+                    } else {
+                        this.prev();
+                    }
+                }, { passive: true });
+            }
+
+            goToSlide(index) {
+                if (index < 0 || index >= this.totalSlides) return;
+
+                this.slides[this.currentSlide].classList.remove('active');
+                this.currentSlide = index;
+                this.slides[this.currentSlide].classList.add('active');
+
+                this.updateUI();
+            }
+
+            next() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prev() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            updateUI() {
+                // Update nav dots
+                const dots = this.navContainer.querySelectorAll('.nav-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentSlide);
+                    dot.setAttribute('aria-current', i === this.currentSlide ? 'true' : 'false');
+                });
+
+                // Update counter
+                this.counter.textContent = `${this.currentSlide + 1} / ${this.totalSlides}`;
+
+                // Update progress bar
+                const progressWidth = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                this.progress.style.width = `${progressWidth}%`;
+
+                // Update arrow buttons
+                this.prevBtn.disabled = this.currentSlide === 0;
+                this.nextBtn.disabled = this.currentSlide === this.totalSlides - 1;
+            }
+        }
+
+        // Initialize presentation when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new Presentation();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+/* style.css - 모듈화된 CSS 통합 파일 */
+/* 이 파일은 여러 CSS 파일들을 한 곳에서 불러오는 메인 스타일시트입니다. */
+
+/* 기본 스타일: 전체 레이아웃, 색상 변수, 폰트 설정 */
+@import url('base.css');
+
+/* 애니메이션: 펄스, 회전, 페이드 등 모든 시각 효과 */
+@import url('animations.css');
+
+/* 상단 네비게이션 바: 로고, 상태 표시, 시간 표시 */
+@import url('navbar.css');
+
+/* 알림 바: 대기오염 등 중요 알림 메시지 */
+@import url('alerts.css');
+
+/* 지도: 서울시 지도, 구/동 영역, 줌 효과 */
+@import url('map.css');
+
+/* 범례: 온도 구간 색상, 센서 타입 표시 */
+@import url('legend.css');
+
+/* 정보 패널: 환경정보 박스, 센서 토글 패널 */
+@import url('panels-info.css');
+
+/* Replay 패널: 과거 데이터 재생 컨트롤 */
+@import url('panels-replay.css');
+
+/* 마커: 센서 마커, 툴팁, 바람 화살표 */
+@import url('markers.css');
+
+/* 유틸리티: 공통으로 사용되는 보조 클래스들 */
+@import url('utilities.css');
+
+/* 반응형: 모바일/태블릿 화면 대응 */
+@import url('responsive.css');

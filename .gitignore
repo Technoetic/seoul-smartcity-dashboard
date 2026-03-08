@@ -1,0 +1,26 @@
+# 환경 변수 (비밀번호, API 키)
+FastAPI/.env
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+
+# 대용량 CSV (68MB)
+MySQL/S-DoT_NATURE_2020.04.01-04.30.csv
+
+# 문서 파일
+*.xlsx
+*.pptx
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+.claude/
+node_modules/

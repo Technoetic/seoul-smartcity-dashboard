@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서울 S-DoT 센서 기후 분석 프리젠테이션</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #1a73e8;
+    --secondary: #ea4335;
+    --accent: #fbbc04;
+    --green: #34a853;
+    --dark: #202124;
+    --gray: #5f6368;
+    --light: #f8f9fa;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.7;
+  }
+
+  /* Slide System */
+  .slide {
+    min-height: 100vh;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .slide:nth-child(odd) { background: #fff; }
+  .slide:nth-child(even) { background: var(--light); }
+
+  /* Cover Slide */
+  .cover {
+    background: #0d1b3e !important;
+    color: #fff;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .cover .cover-icon {
+    font-size: 4.5rem;
+    margin-bottom: 24px;
+    display: block;
+  }
+  .cover h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 20px;
+    letter-spacing: -2px;
+    line-height: 1.25;
+    color: #ffffff;
+  }
+  .cover .subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #c8d6e5;
+    margin-bottom: 16px;
+  }
+  .cover .subtitle-small {
+    font-size: 1rem;
+    color: #7f8fa6;
+    margin-bottom: 50px;
+    letter-spacing: 1px;
+  }
+  .cover .stats-row {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cover .stat-box {
+    background: #162447;
+    border-radius: 16px;
+    padding: 28px 40px;
+    text-align: center;
+    border: 1px solid #1f4068;
+    min-width: 180px;
+  }
+  .cover .stat-box .num {
+    font-size: 2.8rem;
+    font-weight: 900;
+    display: block;
+    line-height: 1.1;
+    color: #4fc3f7;
+  }
+  .cover .stat-box .label {
+    font-size: 0.95rem;
+    color: #90a4ae;
+    margin-top: 8px;
+    font-weight: 400;
+  }
+
+  /* Section Headers */
+  .slide h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .slide h2 .icon { font-size: 1.6rem; }
+  .slide .section-desc {
+    font-size: 1rem;
+    color: var(--gray);
+    margin-bottom: 30px;
+  }
+
+  /* Chart Container */
+  .chart-container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 24px;
+  }
+  .chart-container canvas {
+    max-height: 420px;
+  }
+
+  /* Grid Layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* Insight Cards */
+  .insight-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--primary);
+    transition: transform 0.2s;
+  }
+  .insight-card:hover { transform: translateY(-2px); }
+  .insight-card.red { border-left-color: var(--secondary); }
+  .insight-card.yellow { border-left-color: var(--accent); }
+  .insight-card.green { border-left-color: var(--green); }
+  .insight-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--dark);
+  }
+  .insight-card p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+  .insight-card .big-num {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--primary);
+    display: block;
+    margin: 8px 0;
+  }
+  .insight-card.red .big-num { color: var(--secondary); }
+  .insight-card.yellow .big-num { color: #e37400; }
+  .insight-card.green .big-num { color: var(--green); }
+
+  /* Ranking Table */
+  .rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+  .rank-table th {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: left;
+  }
+  .rank-table td {
+    padding: 12px 18px;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .rank-table tr:hover td { background: #f5f8ff; }
+  .rank-table .rank {
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    width: 50px;
+  }
+  .rank-table .bar-cell { position: relative; }
+  .rank-table .bar-bg {
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    height: 24px;
+    border-radius: 4px;
+    opacity: 0.15;
+  }
+
+  /* Heatmap Grid */
+  .heatmap {
+    display: grid;
+    grid-template-columns: 80px repeat(12, 1fr);
+    gap: 3px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+  }
+  .heatmap .cell {
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border-radius: 6px;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .heatmap .header {
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+  }
+  .heatmap .year-label {
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  /* Bar chart comparison */
+  .compare-bar {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+    font-size: 0.85rem;
+  }
+  .compare-bar .label { width: 140px; font-weight: 500; }
+  .compare-bar .bar {
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: width 0.8s ease;
+  }
+
+  /* Navigation */
+  .nav-dots {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+  }
+  .nav-dots a {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.2);
+    display: block;
+    transition: all 0.3s;
+  }
+  .nav-dots a:hover, .nav-dots a.active {
+    background: var(--primary);
+    transform: scale(1.3);
+  }
+
+  /* Slide number */
+  .slide-num {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 0.85rem;
+    color: var(--gray);
+    opacity: 0.6;
+  }
+
+  /* Key Finding Badge */
+  .finding-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ea4335, #d32f2f);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .finding-badge.blue { background: linear-gradient(135deg, #1a73e8, #0d47a1); }
+  .finding-badge.green { background: linear-gradient(135deg, #34a853, #1b8a3a); }
+  .finding-badge.orange { background: linear-gradient(135deg, #fb8c00, #e65100); }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .slide { padding: 40px 30px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .cover h1 { font-size: 2.2rem; }
+  }
+
+  /* Print styles */
+  @media print {
+    .slide { page-break-after: always; min-height: auto; padding: 30px; }
+    .nav-dots { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation Dots -->
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- SLIDE 1: Cover -->
+<section class="slide cover" id="slide1">
+  <span class="cover-icon">🌡️</span>
+  <h1>서울의 기후,<br>센서가 말하다</h1>
+  <p class="subtitle">S-DoT 4,310만 건 센서 데이터로 본<br>서울의 온도 이야기</p>
+  <p class="subtitle-small">2020.04 ~ 2026.02 &nbsp;|&nbsp; 서울시 25개 자치구 &nbsp;|&nbsp; 실시간 IoT 센서 측정</p>
+  <div class="stats-row">
+    <div class="stat-box">
+      <span class="num">4,310만</span>
+      <span class="label">총 측정 건수</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">25개 구</span>
+      <span class="label">서울 전 지역</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">6년</span>
+      <span class="label">데이터 기간</span>
+    </div>
+    <div class="stat-box">
+      <span class="num">24시간</span>
+      <span class="label">연속 모니터링</span>
+    </div>
+  </div>
+  <span class="slide-num" style="color:rgba(255,255,255,0.35);">1 / 12</span>
+</section>
+
+<!-- SLIDE 2: 연도별 평균 온도 추이 -->
+<section class="slide" id="slide2">
+  <h2><span class="icon">📈</span> 연도별 평균 온도 추이</h2>
+  <p class="section-desc">서울의 연평균 온도는 어떻게 변하고 있을까? (완전 연도 기준: 2021~2025)</p>
+  <div class="grid-2">
+    <div class="chart-container">
+      <canvas id="yearlyTempChart"></canvas>
+    </div>
+    <div>
+      <div class="insight-card red" style="margin-bottom:16px;">
+        <span class="finding-badge">핵심 발견</span>
+        <h3>2024년, 가장 뜨거운 해</h3>
+        <span class="big-num">16.54°C</span>
+        <p>2024년 연평균 온도 16.54°C로 관측 기간 중 최고 기록. 특히 8월 평균 30.2°C는 역대 최고 폭염 수준이었습니다.</p>
+      </div>
+      <div class="insight-card green">
+        <h3>여름은 점점 더워지고 있다</h3>
+        <span class="big-num">+2.5°C</span>
+        <p>여름 평균 온도가 2023년 25.3°C에서 2024년 27.8°C, 2025년 27.9°C로 급상승. 폭염 시대의 본격적 시작을 알립니다.</p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">2 / 12</span>
+</section>
+
+<!-- SLIDE 3: 월별 평균 온도 패턴 -->
+<section class="slide" id="slide3">
+  <h2><span class="icon">🌡️</span> 월별 평균 온도 패턴</h2>
+  <p class="section-desc">같은 달끼리 연도별 비교 - 서울의 월별 온도가 어떻게 변화하고 있는지 확인합니다</p>
+  <div class="chart-container">
+    <canvas id="monthlyCompareChart"></canvas>
+  </div>
+  <div class="grid-3" style="margin-top:16px;">
+    <div class="insight-card red">
+      <h3>8월 최고 기록</h3>
+      <span class="big-num">30.2°C</span>
+      <p>2024년 8월은 역대 가장 뜨거운 달. 2022년(26.3°C) 대비 <strong>3.9°C</strong> 상승</p>
+    </div>
+    <div class="insight-card">
+      <h3>1월 기온 상승 추세</h3>
+      <span class="big-num">+3.1°C</span>
+      <p>1월 평균: 2021년 -2.2°C → 2024년 0.9°C. 겨울이 따뜻해지고 있습니다</p>
+    </div>
+    <div class="insight-card yellow">
+      <h3>봄이 사라진다</h3>
+      <span class="big-num">4→5월</span>
+      <p>4월 온도: 2024년 17.8°C(5월 수준). 봄이 짧아지고 여름이 빨리 시작됩니다</p>
+    </div>
+  </div>
+  <span class="slide-num">3 / 12</span>
+</section>
+
+<!-- SLIDE 4: 히트맵 - 월별 연도별 온도 -->
+<section class="slide" id="slide4">
+  <h2><span class="icon">🗓️</span> 연도-월별 온도 히트맵</h2>
+  <p class="section-desc">색상이 진할수록 온도가 높습니다. 한눈에 보는 서울 6년간의 온도 변화</p>
+  <div class="heatmap" id="heatmap">
+    <!-- JS로 생성 -->
+  </div>
+  <div class="grid-2" style="margin-top:24px;">
+    <div class="insight-card red">
+      <span class="finding-badge">데이터가 보여주는 사실</span>
+      <h3>여름이 길어지고 있다</h3>
+      <p>2020~2022년에는 6~8월만 고온이었지만, 2024~2025년에는 <strong>5월부터 9월까지</strong> 고온 영역이 확장되고 있습니다. 실질적인 여름이 2개월 이상 길어졌습니다.</p>
+    </div>
+    <div class="insight-card">
+      <span class="finding-badge blue">정책 시사점</span>
+      <h3>겨울 난방 vs 여름 냉방</h3>
+      <p>겨울(12~2월) 온도는 연도별로 크게 변동하지 않지만, 여름 온도는 꾸준히 상승. <strong>냉방 수요 증가에 대한 도시 인프라 준비</strong>가 필요합니다.</p>
+    </div>
+  </div>
+  <span class="slide-num">4 / 12</span>
+</section>
+
+<!-- SLIDE 5: 계절별 온도 추이 -->
+<section class="slide" id="slide5">
+  <h2><span class="icon">🍂</span> 계절별 온도 추이 (2021~2025)</h2>
+  <p class="section-desc">봄·여름·가을·겨울, 어느 계절이 가장 크게 변하고 있을까?</p>
+  <div class="grid-2">
+    <div class="chart-container">
+      <canvas id="seasonChart"></canvas>
+    </div>
+    <div>
+      <div class="insight-card red" style="margin-bottom:16px;">
+        <h3>여름 폭염 강도 심화</h3>
+        <p>여름 평균 온도 추이: <strong>27.2°C(2021) → 25.3°C(2023) → 27.8°C(2024) → 27.9°C(2025)</strong></p>
+        <p style="margin-top:8px;">특히 2024~2025 연속 고온은 기후변화의 뚜렷한 신호입니다.</p>
+      </div>
+      <div class="insight-card green" style="margin-bottom:16px;">
+        <h3>가을이 따뜻해지고 있다</h3>
+        <p>가을 평균: 2021년 15.8°C → 2024년 18.5°C (<strong>+2.7°C</strong>)</p>
+        <p style="margin-top:8px;">10월이 과거 9월 수준의 온도를 기록하고 있습니다.</p>
+      </div>
+      <div class="insight-card">
+        <h3>겨울은 변동적</h3>
+        <p>겨울 평균 온도는 0.3°C~2.5°C 사이에서 연도별로 크게 요동. 일관된 추세보다는 <strong>극단적 한파</strong>와 <strong>따뜻한 겨울</strong>이 교차합니다.</p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">5 / 12</span>
+</section>
+
+<!-- SLIDE 6: 구별 평균 온도 랭킹 -->
+<section class="slide" id="slide6">
+  <h2><span class="icon">🏘️</span> 자치구별 평균 온도</h2>
+  <p class="section-desc">같은 서울이라도 구마다 온도가 다릅니다. 가장 뜨거운 구와 가장 시원한 구의 차이는?</p>
+  <div class="grid-2">
+    <div class="chart-container">
+      <canvas id="districtTempChart"></canvas>
+    </div>
+    <div>
+      <div class="insight-card red" style="margin-bottom:16px;">
+        <h3>가장 뜨거운 구</h3>
+        <span class="big-num" style="font-size:1.6rem;">영등포구 15.9°C</span>
+        <p>한강변 콘크리트 밀집 지역. 성동구(15.8°C), 금천구(15.7°C) 순</p>
+      </div>
+      <div class="insight-card green" style="margin-bottom:16px;">
+        <h3>가장 시원한 구</h3>
+        <span class="big-num" style="font-size:1.6rem; color:var(--green);">강북구 14.0°C</span>
+        <p>북한산 인접 녹지 풍부. 강서구(14.4°C), 강동구(14.5°C) 순</p>
+      </div>
+      <div class="insight-card yellow">
+        <h3>구간 온도 격차</h3>
+        <span class="big-num" style="font-size:1.6rem; color:#e37400;">1.9°C</span>
+        <p>같은 서울이지만 최대 <strong>1.9°C</strong>의 온도 차이. 이는 체감온도로 환산하면 더욱 큰 차이를 의미합니다.</p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">6 / 12</span>
+</section>
+
+<!-- SLIDE 7: 여름 폭염 분석 -->
+<section class="slide" id="slide7">
+  <h2><span class="icon">🔥</span> 여름 폭염 심화 추이</h2>
+  <p class="section-desc">30°C 이상 고온 시간 비율이 해마다 증가하고 있습니다</p>
+  <div class="grid-2">
+    <div class="chart-container">
+      <canvas id="heatwaveChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <canvas id="extremeHeatChart"></canvas>
+    </div>
+  </div>
+  <div class="grid-3" style="margin-top:16px;">
+    <div class="insight-card red">
+      <span class="finding-badge">경고 신호</span>
+      <h3>폭염 비율 2배 증가</h3>
+      <span class="big-num">31.1%</span>
+      <p>2025년 여름, 전체 시간의 <strong>31.1%</strong>가 30°C 이상. 2020년(17.6%) 대비 거의 2배 증가.</p>
+    </div>
+    <div class="insight-card red">
+      <h3>극심 폭염(33°C+) 급증</h3>
+      <span class="big-num">12.2%</span>
+      <p>2025년 여름, 33°C 이상 시간 비율 <strong>12.2%</strong>. 2020년(4.3%) 대비 3배 증가.</p>
+    </div>
+    <div class="insight-card yellow">
+      <h3>2024년 8월 역대 최악</h3>
+      <span class="big-num">30.2°C</span>
+      <p>2024년 8월 평균 온도 30.2°C. 일 최고 온도 44.9°C까지 센서에 기록됨.</p>
+    </div>
+  </div>
+  <span class="slide-num">7 / 12</span>
+</section>
+
+<!-- SLIDE 8: 열대야 분석 -->
+<section class="slide" id="slide8">
+  <h2><span class="icon">🌙</span> 열대야: 밤에도 잠 못 드는 서울</h2>
+  <p class="section-desc">7~8월 야간(22시~06시) 25°C 이상 비율 - 어느 구가 밤에 가장 덥나?</p>
+  <div class="chart-container">
+    <canvas id="tropicalNightChart"></canvas>
+  </div>
+  <div class="grid-2" style="margin-top:16px;">
+    <div class="insight-card red">
+      <span class="finding-badge">생활 정보</span>
+      <h3>열대야 최다: 영등포구</h3>
+      <span class="big-num">79.3%</span>
+      <p>여름밤 10번 중 약 8번이 열대야. 성동구(78.7%), 금천구(77.6%) 순. <strong>한강변·도심 밀집지역</strong>일수록 심합니다.</p>
+    </div>
+    <div class="insight-card green">
+      <h3>열대야 최소: 강북구</h3>
+      <span class="big-num" style="color:var(--green);">63.5%</span>
+      <p>서울에서 가장 시원한 밤. 은평구(64.5%), 도봉구(64.5%) 순. <strong>산과 녹지가 많은 지역</strong>이 야간 냉각이 빠릅니다.</p>
+    </div>
+  </div>
+  <span class="slide-num">8 / 12</span>
+</section>
+
+<!-- SLIDE 9: 시간대별 온도 패턴 -->
+<section class="slide" id="slide9">
+  <h2><span class="icon">🕐</span> 하루 24시간 온도 리듬</h2>
+  <p class="section-desc">서울의 하루 온도는 어떤 패턴을 그릴까?</p>
+  <div class="grid-2">
+    <div class="chart-container">
+      <canvas id="hourlyTempChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <canvas id="hourlyHumidChart"></canvas>
+    </div>
+  </div>
+  <div class="grid-4" style="margin-top:16px;">
+    <div class="insight-card">
+      <h3>가장 추운 시간</h3>
+      <span class="big-num" style="font-size:1.5rem;">오전 7시</span>
+      <p>12.3°C - 일출 직전이 하루 중 가장 낮은 온도</p>
+    </div>
+    <div class="insight-card red">
+      <h3>가장 더운 시간</h3>
+      <span class="big-num" style="font-size:1.5rem;">오후 3시</span>
+      <p>18.5°C - 태양 복사열 축적이 최대인 시점</p>
+    </div>
+    <div class="insight-card green">
+      <h3>가장 건조한 시간</h3>
+      <span class="big-num" style="font-size:1.5rem;">오후 3시</span>
+      <p>습도 49.9% - 온도가 높을수록 상대습도 하락</p>
+    </div>
+    <div class="insight-card">
+      <h3>가장 습한 시간</h3>
+      <span class="big-num" style="font-size:1.5rem;">오전 7시</span>
+      <p>습도 71.4% - 이슬점 온도에 도달하는 새벽~아침</p>
+    </div>
+  </div>
+  <span class="slide-num">9 / 12</span>
+</section>
+
+<!-- SLIDE 10: 열섬효과 -->
+<section class="slide" id="slide10">
+  <h2><span class="icon">🏙️</span> 도시 열섬효과: 낮과 밤의 온도차</h2>
+  <p class="section-desc">여름(7~8월) 오후 2시 vs 새벽 3시 온도 차이 - 열섬효과가 가장 큰 구는?</p>
+  <div class="chart-container">
+    <canvas id="heatIslandChart"></canvas>
+  </div>
+  <div class="grid-2" style="margin-top:16px;">
+    <div class="insight-card yellow">
+      <span class="finding-badge orange">열섬효과 최대</span>
+      <h3>도봉구: 5.0°C 차이</h3>
+      <p>열섬효과 최대 지역. 은평구(4.9°C), 노원구(4.9°C) 순. 의외로 <strong>외곽 주거지역</strong>에서 열섬효과가 크게 나타납니다.</p>
+    </div>
+    <div class="insight-card green">
+      <span class="finding-badge green">열섬효과 최소</span>
+      <h3>중구: 4.1°C 차이</h3>
+      <p>도심이지만 열섬효과가 가장 작은 구. 한강, 청계천 등 <strong>수변 인프라</strong>와 <strong>빌딩숲 그늘효과</strong>가 야간 냉각을 돕습니다.</p>
+    </div>
+  </div>
+  <span class="slide-num">10 / 12</span>
+</section>
+
+<!-- SLIDE 11: 쾌적한 구 랭킹 -->
+<section class="slide" id="slide11">
+  <h2><span class="icon">😊</span> 가장 쾌적한 구는 어디일까?</h2>
+  <p class="section-desc">쾌적 온도(18~25°C) 비율과 쾌적 습도(40~60%) 비율을 종합해 쾌적 지수를 산출했습니다</p>
+  <div class="grid-2">
+    <div class="chart-container">
+      <canvas id="comfortChart"></canvas>
+    </div>
+    <div>
+      <div class="insight-card green" style="margin-bottom:16px;">
+        <span class="finding-badge green">쾌적 1위</span>
+        <h3>영등포구</h3>
+        <p>쾌적 온도 비율 23.0%, 쾌적 습도 비율 36.0%. 종합 쾌적 지수 서울 1위.</p>
+        <p style="margin-top:8px; font-size:0.82rem; color:var(--gray);">단, 여름 폭염과 열대야는 최악이므로 <strong>봄·가을 한정</strong> 쾌적 지역</p>
+      </div>
+      <div class="insight-card" style="margin-bottom:16px;">
+        <h3>성동구 - 습도 쾌적 1위</h3>
+        <p>습도 40~60% 비율이 <strong>36.4%</strong>로 서울에서 가장 높음. 한강 인접 + 적절한 바람통로.</p>
+      </div>
+      <div class="insight-card yellow">
+        <h3>강동구 - 습도 쾌적 최하위</h3>
+        <p>습도 쾌적 비율 <strong>27.3%</strong>로 서울 최하위. 높은 평균 습도(66.4%)는 여름 불쾌지수 상승의 원인.</p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">11 / 12</span>
+</section>
+
+<!-- SLIDE 12: 결론 -->
+<section class="slide cover" id="slide12" style="background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);">
+  <h1 style="font-size:2.4rem; margin-bottom:40px;">핵심 결론 & 정책 시사점</h1>
+  <div class="grid-3" style="max-width:1100px; margin:0 auto;">
+    <div class="stat-box" style="background:rgba(234,67,53,0.2); border:1px solid rgba(234,67,53,0.4); border-radius:16px; padding:28px; text-align:left;">
+      <span style="font-size:2rem;">🔥</span>
+      <h3 style="font-size:1.1rem; margin:12px 0 8px;">서울이 점점 더워지고 있다</h3>
+      <p style="font-size:0.88rem; opacity:0.9; line-height:1.6;">여름 30°C 이상 비율이 6년간 17.6%→31.1%로 <strong>약 2배</strong> 증가. 극심 폭염도 3배 증가했습니다.</p>
+    </div>
+    <div class="stat-box" style="background:rgba(251,188,4,0.2); border:1px solid rgba(251,188,4,0.4); border-radius:16px; padding:28px; text-align:left;">
+      <span style="font-size:2rem;">🌙</span>
+      <h3 style="font-size:1.1rem; margin:12px 0 8px;">열대야의 일상화</h3>
+      <p style="font-size:0.88rem; opacity:0.9; line-height:1.6;">여름밤의 63~79%가 열대야. 영등포·성동·금천구는 <strong>10번 중 8번</strong>이 열대야입니다.</p>
+    </div>
+    <div class="stat-box" style="background:rgba(52,168,83,0.2); border:1px solid rgba(52,168,83,0.4); border-radius:16px; padding:28px; text-align:left;">
+      <span style="font-size:2rem;">🌳</span>
+      <h3 style="font-size:1.1rem; margin:12px 0 8px;">녹지가 답이다</h3>
+      <p style="font-size:0.88rem; opacity:0.9; line-height:1.6;">북한산 인접 강북구, 도봉구는 여름 2°C 이상 시원합니다. 도시 숲 확대가 최선의 냉각 전략.</p>
+    </div>
+  </div>
+  <div style="margin-top:40px; padding:24px; background:rgba(255,255,255,0.1); border-radius:16px; max-width:900px; margin-left:auto; margin-right:auto;">
+    <p style="font-size:1rem; text-align:center; opacity:0.9;">
+      <strong>데이터 출처:</strong> 서울시 도시데이터 센서(S-DoT) | 총 4,310만 건 측정 | 2020.04~2026.02<br>
+      <span style="font-size:0.85rem; opacity:0.7;">온도·습도 센서 기반 실측 데이터. 기상청 관측소와 달리 도시 곳곳의 미시적 기후를 반영합니다.</span>
+    </p>
+  </div>
+  <span class="slide-num" style="color:rgba(255,255,255,0.5);">12 / 12</span>
+</section>
+
+<script>
+// ===== Chart.js 기본 설정 =====
+Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+// 구 이름 한글 매핑
+const guNameMap = {
+  'Gangnam-gu': '강남구', 'Gangdong-gu': '강동구', 'Gangbuk-gu': '강북구',
+  'Gangseo-gu': '강서구', 'Gwanak-gu': '관악구', 'Gwangjin-gu': '광진구',
+  'Guro-gu': '구로구', 'Geumcheon-gu': '금천구', 'Nowon-gu': '노원구',
+  'Dobong-gu': '도봉구', 'Dongdaemun-gu': '동대문구', 'Dongjak-gu': '동작구',
+  'Mapo-gu': '마포구', 'Seodaemun-gu': '서대문구', 'Seocho-gu': '서초구',
+  'Seongdong-gu': '성동구', 'Seongbuk-gu': '성북구', 'Songpa-gu': '송파구',
+  'Yangcheon-gu': '양천구', 'Yeongdeungpo-gu': '영등포구', 'Yongsan-gu': '용산구',
+  'Eunpyeong-gu': '은평구', 'Jongno-gu': '종로구', 'Jung-gu': '중구',
+  'Jungnang-gu': '중랑구'
+};
+
+// ===== SLIDE 2: 연도별 평균 온도 =====
+new Chart(document.getElementById('yearlyTempChart'), {
+  type: 'line',
+  data: {
+    labels: ['2021', '2022', '2023', '2024', '2025'],
+    datasets: [{
+      label: '연평균 온도 (°C)',
+      data: [13.55, 14.81, 15.15, 16.54, 14.16],
+      borderColor: '#ea4335',
+      backgroundColor: 'rgba(234,67,53,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 6,
+      pointHoverRadius: 9,
+      borderWidth: 3,
+    }, {
+      label: '연평균 습도 (%)',
+      data: [58.88, 60.10, 64.37, 65.68, 64.31],
+      borderColor: '#1a73e8',
+      backgroundColor: 'rgba(26,115,232,0.05)',
+      fill: false,
+      tension: 0.4,
+      pointRadius: 5,
+      borderWidth: 2,
+      yAxisID: 'y1',
+    }]
+  },
+  options: {
+    responsive: true,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      title: { display: true, text: '연도별 평균 온도 & 습도', font: { size: 15, weight: 'bold' } }
+    },
+    scales: {
+      y: { title: { display: true, text: '온도 (°C)' }, min: 12, max: 18 },
+      y1: { position: 'right', title: { display: true, text: '습도 (%)' }, min: 55, max: 70, grid: { drawOnChartArea: false } }
+    }
+  }
+});
+
+// ===== SLIDE 3: 월별 연도별 비교 =====
+const monthlyData = {
+  2021: [-2.19, 4.11, 10.84, 15.70, 18.64, 24.29, 29.38, 27.35, 24.36, 16.22, 9.53, 3.24],
+  2022: [-0.09, 0.95, 9.32, 16.08, 20.16, 24.25, 28.61, 26.29, 23.73, 16.07, 11.84, -0.07],
+  2023: [0.35, 4.48, 12.57, 14.86, 20.06, 23.58, 25.90, 26.50, 23.46, 17.00, 8.31, 2.65],
+  2024: [0.92, 5.71, 8.28, 17.76, 19.84, 25.69, 27.36, 30.20, 26.32, 17.76, 11.11, 1.83],
+  2025: [0.66, -0.02, 8.97, 14.56, 18.92, 24.92, 29.53, 29.02, 24.87, 19.34, 9.95, 2.59],
+};
+const colors = {2021:'#4285F4', 2022:'#34A853', 2023:'#FBBC04', 2024:'#EA4335', 2025:'#9C27B0'};
+const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+new Chart(document.getElementById('monthlyCompareChart'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: Object.entries(monthlyData).map(([yr, data]) => ({
+      label: yr + '년',
+      data: data,
+      borderColor: colors[yr],
+      backgroundColor: 'transparent',
+      tension: 0.3,
+      pointRadius: 4,
+      borderWidth: yr === '2024' || yr === '2025' ? 3 : 1.5,
+      borderDash: yr === '2021' || yr === '2022' ? [5,5] : [],
+    }))
+  },
+  options: {
+    responsive: true,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      title: { display: true, text: '같은 달끼리 연도별 온도 비교', font: { size: 15, weight: 'bold' } },
+    },
+    scales: {
+      y: { title: { display: true, text: '평균 온도 (°C)' } }
+    }
+  }
+});
+
+// ===== SLIDE 4: 히트맵 =====
+const heatmapData = {
+  2020: [null, null, null, 13.25, 20.29, 25.69, 25.95, 28.02, 23.04, 16.49, 8.73, 1.73],
+  2021: [-2.19, 4.11, 10.84, 15.70, 18.64, 24.29, 29.38, 27.35, 24.36, 16.22, 9.53, 3.24],
+  2022: [-0.09, 0.95, 9.32, 16.08, 20.16, 24.25, 28.61, 26.29, 23.73, 16.07, 11.84, -0.07],
+  2023: [0.35, 4.48, 12.57, 14.86, 20.06, 23.58, 25.90, 26.50, 23.46, 17.00, 8.31, 2.65],
+  2024: [0.92, 5.71, 8.28, 17.76, 19.84, 25.69, 27.36, 30.20, 26.32, 17.76, 11.11, 1.83],
+  2025: [0.66, -0.02, 8.97, 14.56, 18.92, 24.92, 29.53, 29.02, 24.87, 19.34, 9.95, 2.59],
+};
+
+function tempToColor(t) {
+  if (t === null) return '#e0e0e0';
+  if (t <= -5) return '#1565C0';
+  if (t <= 0) return '#1E88E5';
+  if (t <= 5) return '#42A5F5';
+  if (t <= 10) return '#80DEEA';
+  if (t <= 15) return '#A5D6A7';
+  if (t <= 20) return '#C5E1A5';
+  if (t <= 25) return '#FFE082';
+  if (t <= 28) return '#FFB74D';
+  if (t <= 30) return '#FF8A65';
+  return '#E53935';
+}
+
+const hmEl = document.getElementById('heatmap');
+// Headers
+hmEl.innerHTML = '<div class="header"></div>';
+months.forEach(m => { hmEl.innerHTML += `<div class="header">${m}</div>`; });
+// Data rows
+Object.entries(heatmapData).forEach(([yr, data]) => {
+  hmEl.innerHTML += `<div class="year-label">${yr}</div>`;
+  data.forEach(t => {
+    const bg = tempToColor(t);
+    const txt = t !== null ? t.toFixed(1) + '°' : '-';
+    hmEl.innerHTML += `<div class="cell" style="background:${bg};">${txt}</div>`;
+  });
+});
+
+// ===== SLIDE 5: 계절별 온도 =====
+new Chart(document.getElementById('seasonChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2021', '2022', '2023', '2024', '2025'],
+    datasets: [
+      { label: '봄(3~5월)', data: [14.91, 14.55, 16.48, 15.19, 13.94], backgroundColor: '#A5D6A7', borderRadius: 4 },
+      { label: '여름(6~8월)', data: [27.17, 26.42, 25.34, 27.78, 27.87], backgroundColor: '#EF5350', borderRadius: 4 },
+      { label: '가을(9~11월)', data: [15.81, 17.17, 15.92, 18.54, 17.20], backgroundColor: '#FFB74D', borderRadius: 4 },
+      { label: '겨울(12~2월)', data: [2.36, 0.28, 2.30, 2.52, 1.16], backgroundColor: '#42A5F5', borderRadius: 4 },
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '계절별 평균 온도 추이', font: { size: 15, weight: 'bold' } },
+    },
+    scales: {
+      y: { title: { display: true, text: '평균 온도 (°C)' } }
+    }
+  }
+});
+
+// ===== SLIDE 6: 구별 평균 온도 =====
+const distData = [
+  {gu:'Yeongdeungpo-gu',t:15.90},{gu:'Seongdong-gu',t:15.77},{gu:'Geumcheon-gu',t:15.65},
+  {gu:'Yongsan-gu',t:15.52},{gu:'Jungnang-gu',t:15.47},{gu:'Mapo-gu',t:15.46},
+  {gu:'Songpa-gu',t:15.35},{gu:'Dongjak-gu',t:15.35},{gu:'Yangcheon-gu',t:15.31},
+  {gu:'Dongdaemun-gu',t:15.30},{gu:'Gwanak-gu',t:15.29},{gu:'Gwangjin-gu',t:15.26},
+  {gu:'Jongno-gu',t:15.18},{gu:'Guro-gu',t:15.14},{gu:'Jung-gu',t:15.00},
+  {gu:'Gangnam-gu',t:14.99},{gu:'Nowon-gu',t:14.92},{gu:'Seongbuk-gu',t:14.81},
+  {gu:'Seocho-gu',t:14.76},{gu:'Dobong-gu',t:14.62},{gu:'Seodaemun-gu',t:14.54},
+  {gu:'Eunpyeong-gu',t:14.50},{gu:'Gangdong-gu',t:14.46},{gu:'Gangseo-gu',t:14.39},
+  {gu:'Gangbuk-gu',t:13.98}
+];
+
+new Chart(document.getElementById('districtTempChart'), {
+  type: 'bar',
+  data: {
+    labels: distData.map(d => guNameMap[d.gu] || d.gu),
+    datasets: [{
+      label: '평균 온도 (°C)',
+      data: distData.map(d => d.t),
+      backgroundColor: distData.map(d => {
+        if (d.t >= 15.5) return '#EF5350';
+        if (d.t >= 15.0) return '#FF8A65';
+        if (d.t >= 14.5) return '#FFB74D';
+        return '#66BB6A';
+      }),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '자치구별 평균 온도 랭킹', font: { size: 15, weight: 'bold' } },
+      legend: { display: false }
+    },
+    scales: {
+      x: { min: 13.5, max: 16.2, title: { display: true, text: '평균 온도 (°C)' } }
+    }
+  }
+});
+
+// ===== SLIDE 7: 폭염 추이 =====
+new Chart(document.getElementById('heatwaveChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [{
+      label: '30°C 이상 비율 (%)',
+      data: [17.62, 26.08, 18.74, 22.88, 30.27, 31.07],
+      backgroundColor: ['#FF8A65','#EF5350','#FF8A65','#FFB74D','#D32F2F','#B71C1C'],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '여름(6~8월) 30°C 이상 비율', font: { size: 14, weight: 'bold' } },
+      legend: { display: false }
+    },
+    scales: { y: { title: { display: true, text: '%' }, min: 0, max: 35 } }
+  }
+});
+
+new Chart(document.getElementById('extremeHeatChart'), {
+  type: 'line',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [{
+      label: '33°C 이상 극심 폭염 비율 (%)',
+      data: [4.31, 9.94, 5.27, 8.93, 10.53, 12.17],
+      borderColor: '#D32F2F',
+      backgroundColor: 'rgba(211,47,47,0.15)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 6,
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '33°C 이상 극심 폭염 비율 추이', font: { size: 14, weight: 'bold' } },
+    },
+    scales: { y: { title: { display: true, text: '%' }, min: 0 } }
+  }
+});
+
+// ===== SLIDE 8: 열대야 =====
+const tropData = [
+  {gu:'Yeongdeungpo-gu',p:79.33},{gu:'Seongdong-gu',p:78.70},{gu:'Geumcheon-gu',p:77.63},
+  {gu:'Yongsan-gu',p:76.89},{gu:'Dongdaemun-gu',p:75.92},{gu:'Songpa-gu',p:75.37},
+  {gu:'Mapo-gu',p:75.17},{gu:'Jungnang-gu',p:74.89},{gu:'Yangcheon-gu',p:74.86},
+  {gu:'Jung-gu',p:74.29},{gu:'Gwangjin-gu',p:74.06},{gu:'Jongno-gu',p:73.46},
+  {gu:'Dongjak-gu',p:73.22},{gu:'Gwanak-gu',p:73.12},{gu:'Guro-gu',p:73.06},
+  {gu:'Seongbuk-gu',p:71.46},{gu:'Gangnam-gu',p:70.22},{gu:'Seocho-gu',p:67.74},
+  {gu:'Nowon-gu',p:67.35},{gu:'Gangseo-gu',p:66.94},{gu:'Seodaemun-gu',p:66.86},
+  {gu:'Gangdong-gu',p:65.03},{gu:'Dobong-gu',p:64.53},{gu:'Eunpyeong-gu',p:64.46},
+  {gu:'Gangbuk-gu',p:63.54}
+];
+
+new Chart(document.getElementById('tropicalNightChart'), {
+  type: 'bar',
+  data: {
+    labels: tropData.map(d => guNameMap[d.gu]),
+    datasets: [{
+      label: '열대야 비율 (%)',
+      data: tropData.map(d => d.p),
+      backgroundColor: tropData.map(d => {
+        if (d.p >= 75) return '#C62828';
+        if (d.p >= 70) return '#EF5350';
+        if (d.p >= 65) return '#FF8A65';
+        return '#66BB6A';
+      }),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '7~8월 야간(22~06시) 25°C 이상 비율', font: { size: 15, weight: 'bold' } },
+      legend: { display: false }
+    },
+    scales: {
+      y: { min: 60, max: 82, title: { display: true, text: '열대야 비율 (%)' } },
+      x: { ticks: { maxRotation: 45 } }
+    }
+  }
+});
+
+// ===== SLIDE 9: 시간대별 =====
+const hourLabels = Array.from({length:24}, (_, i) => i+'시');
+const hourTemp = [13.29,13.56,14.63,13.43,12.24,12.46,12.29,12.25,12.66,13.50,14.64,15.83,16.88,17.64,18.17,18.45,18.38,17.95,17.18,16.33,15.57,14.96,14.51,14.10];
+const hourHumid = [66.19,67.62,69.42,69.81,69.65,70.79,71.32,71.37,69.95,66.95,62.88,58.75,55.03,52.32,50.54,49.91,50.33,51.76,54.26,57.23,60.07,62.24,63.93,65.26];
+
+new Chart(document.getElementById('hourlyTempChart'), {
+  type: 'line',
+  data: {
+    labels: hourLabels,
+    datasets: [{
+      label: '평균 온도 (°C)',
+      data: hourTemp,
+      borderColor: '#EF5350',
+      backgroundColor: 'rgba(239,83,80,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 4,
+      borderWidth: 2.5,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '시간대별 평균 온도', font: { size: 14, weight: 'bold' } },
+    },
+    scales: { y: { min: 11, max: 20, title: { display: true, text: '°C' } } }
+  }
+});
+
+new Chart(document.getElementById('hourlyHumidChart'), {
+  type: 'line',
+  data: {
+    labels: hourLabels,
+    datasets: [{
+      label: '평균 습도 (%)',
+      data: hourHumid,
+      borderColor: '#1E88E5',
+      backgroundColor: 'rgba(30,136,229,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 4,
+      borderWidth: 2.5,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '시간대별 평균 습도', font: { size: 14, weight: 'bold' } },
+    },
+    scales: { y: { min: 48, max: 74, title: { display: true, text: '%' } } }
+  }
+});
+
+// ===== SLIDE 10: 열섬효과 =====
+const heatIsland = [
+  {gu:'Dobong-gu',d:4.97},{gu:'Eunpyeong-gu',d:4.94},{gu:'Nowon-gu',d:4.93},
+  {gu:'Jungnang-gu',d:4.82},{gu:'Jongno-gu',d:4.75},{gu:'Gangdong-gu',d:4.75},
+  {gu:'Songpa-gu',d:4.71},{gu:'Yongsan-gu',d:4.67},{gu:'Gwanak-gu',d:4.66},
+  {gu:'Gwangjin-gu',d:4.62},{gu:'Seocho-gu',d:4.53},{gu:'Guro-gu',d:4.52},
+  {gu:'Mapo-gu',d:4.52},{gu:'Geumcheon-gu',d:4.48},{gu:'Gangbuk-gu',d:4.46},
+  {gu:'Yangcheon-gu',d:4.45},{gu:'Dongdaemun-gu',d:4.44},{gu:'Gangnam-gu',d:4.44},
+  {gu:'Seongbuk-gu',d:4.36},{gu:'Gangseo-gu',d:4.34},{gu:'Yeongdeungpo-gu',d:4.28},
+  {gu:'Seongdong-gu',d:4.27},{gu:'Dongjak-gu',d:4.26},{gu:'Seodaemun-gu',d:4.26},
+  {gu:'Jung-gu',d:4.06}
+];
+
+new Chart(document.getElementById('heatIslandChart'), {
+  type: 'bar',
+  data: {
+    labels: heatIsland.map(d => guNameMap[d.gu]),
+    datasets: [{
+      label: '낮-밤 온도차 (°C)',
+      data: heatIsland.map(d => d.d),
+      backgroundColor: heatIsland.map(d => {
+        if (d.d >= 4.8) return '#D32F2F';
+        if (d.d >= 4.5) return '#FF8A65';
+        if (d.d >= 4.3) return '#FFB74D';
+        return '#66BB6A';
+      }),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '여름 낮(14시) vs 밤(3시) 온도차', font: { size: 15, weight: 'bold' } },
+      legend: { display: false }
+    },
+    scales: {
+      y: { min: 3.8, max: 5.2, title: { display: true, text: '온도차 (°C)' } },
+      x: { ticks: { maxRotation: 45 } }
+    }
+  }
+});
+
+// ===== SLIDE 11: 쾌적도 =====
+const comfortData = [
+  {gu:'Yeongdeungpo-gu', tc:23.04, hc:35.96},
+  {gu:'Seongdong-gu', tc:22.54, hc:36.35},
+  {gu:'Dongdaemun-gu', tc:22.56, hc:35.18},
+  {gu:'Gwanak-gu', tc:22.68, hc:33.75},
+  {gu:'Gangnam-gu', tc:22.65, hc:31.43},
+  {gu:'Dongjak-gu', tc:22.64, hc:33.49},
+  {gu:'Mapo-gu', tc:22.58, hc:34.86},
+  {gu:'Yongsan-gu', tc:22.57, hc:34.26},
+  {gu:'Jungnang-gu', tc:22.55, hc:33.42},
+  {gu:'Eunpyeong-gu', tc:22.54, hc:30.99},
+  {gu:'Nowon-gu', tc:22.53, hc:31.12},
+  {gu:'Geumcheon-gu', tc:22.45, hc:34.42},
+  {gu:'Yangcheon-gu', tc:22.44, hc:34.04},
+  {gu:'Gwangjin-gu', tc:22.39, hc:33.86},
+  {gu:'Seocho-gu', tc:22.32, hc:31.22},
+  {gu:'Guro-gu', tc:22.27, hc:34.42},
+  {gu:'Songpa-gu', tc:22.22, hc:33.88},
+  {gu:'Gangdong-gu', tc:22.21, hc:27.25},
+  {gu:'Jung-gu', tc:22.15, hc:35.08},
+  {gu:'Jongno-gu', tc:22.16, hc:33.24},
+  {gu:'Seongbuk-gu', tc:22.15, hc:33.88},
+  {gu:'Dobong-gu', tc:22.12, hc:29.48},
+  {gu:'Gangseo-gu', tc:21.92, hc:31.01},
+  {gu:'Seodaemun-gu', tc:21.80, hc:33.47},
+  {gu:'Gangbuk-gu', tc:21.62, hc:30.84}
+];
+// 종합 쾌적지수: (tc + hc) / 2
+comfortData.forEach(d => d.score = ((d.tc + d.hc) / 2).toFixed(2));
+comfortData.sort((a, b) => b.score - a.score);
+
+new Chart(document.getElementById('comfortChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [{
+      label: '쾌적도 (온도 vs 습도)',
+      data: comfortData.map(d => ({ x: d.tc, y: d.hc, label: guNameMap[d.gu] })),
+      backgroundColor: comfortData.map(d => {
+        const s = parseFloat(d.score);
+        if (s >= 29) return '#2E7D32';
+        if (s >= 28) return '#66BB6A';
+        if (s >= 27) return '#FFB74D';
+        return '#EF5350';
+      }),
+      pointRadius: 10,
+      pointHoverRadius: 14,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '구별 쾌적 온도 vs 쾌적 습도 비율', font: { size: 14, weight: 'bold' } },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            const d = comfortData[ctx.dataIndex];
+            return `${guNameMap[d.gu]}: 온도 ${d.tc}%, 습도 ${d.hc}%`;
+          }
+        }
+      },
+      legend: { display: false }
+    },
+    scales: {
+      x: { title: { display: true, text: '쾌적 온도(18~25°C) 비율 (%)' }, min: 21.4, max: 23.2 },
+      y: { title: { display: true, text: '쾌적 습도(40~60%) 비율 (%)' }, min: 26, max: 38 }
+    }
+  }
+});
+
+// ===== Navigation Dots =====
+const slides = document.querySelectorAll('.slide');
+const navDots = document.getElementById('navDots');
+slides.forEach((_, i) => {
+  const a = document.createElement('a');
+  a.href = '#slide' + (i + 1);
+  a.title = 'Slide ' + (i + 1);
+  navDots.appendChild(a);
+});
+
+// Highlight active dot on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navDots.querySelectorAll('a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.5 });
+slides.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+        /* Replay 박스: 과거 데이터 재생 컨트롤 패널 */
+        .replay-box {
+            top: 500px;  /* 환경정보 박스 아래에 배치 */
+            border: 1px solid var(--color-replay);  /* 보라색 테두리 */
+            padding: 1.25rem;
+        }
+
+        /* Replay 제목 영역: 제목 + ON/OFF 토글 */
+        .replay-title {
+            font-weight: bold;
+            color: #c39bd3;  /* 밝은 보라색 */
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;  /* 제목과 토글 양쪽 정렬 */
+        }
+
+        /* Replay 토글 영역 */
+        .replay-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 토글 레이블 */
+        .replay-toggle label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Replay 컨트롤 내용 (기본적으로 숨김) */
+        .replay-content {
+            display: none;  /* OFF 상태에서는 숨김 */
+        }
+
+        /* Replay ON 상태에서 컨트롤 표시 */
+        .replay-content.visible {
+            display: block;  /* 표시 */
+        }
+
+        .replay-date-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .replay-date-input {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .replay-date-input:focus {
+            outline: none;
+            border-color: var(--color-replay);
+        }
+
+        .replay-time-section {
+            margin-top: 10px;
+        }
+
+        .replay-time-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .replay-time-label span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .replay-time-value {
+            color: var(--color-replay);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Replay 시간 슬라이더: 0시~23시 선택 */
+        .replay-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;  /* 브라우저 기본 스타일 제거 */
+            appearance: none;
+            background: var(--bg-tertiary);  /* 슬라이더 배경 */
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* 슬라이더 손잡이 (Chrome, Safari) */
+        .replay-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--color-replay);  /* 보라색 손잡이 */
+            border-radius: 50%;  /* 원형 */
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(155, 89, 182, 0.6);  /* 보라색 빛 */
+            transition: transform 0.2s ease;
+        }
+
+        /* 슬라이더 손잡이 호버 효과 */
+        .replay-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);  /* 20% 확대 */
+        }
+
+        /* 슬라이더 손잡이 (Firefox) */
+        .replay-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--color-replay);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 8px rgba(155, 89, 182, 0.6);
+        }
+
+        .replay-time-marks {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .replay-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .replay-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--color-replay);
+            color: var(--color-replay);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: var(--color-replay);
+            color: white;
+        }
+
+        .replay-btn.active {
+            background: var(--color-replay);
+            color: white;
+        }
+
+        .replay-status {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .replay-status.active {
+            color: var(--color-replay);
+        }
+
+        /* Replay 재생 속도 조절 */
+        .replay-speed-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .replay-speed-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-right: 4px;
+        }
+
+        .replay-speed-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .replay-speed-btn:hover {
+            border-color: var(--color-replay);
+            color: var(--color-replay);
+        }
+
+        .replay-speed-btn.active {
+            background: var(--color-replay);
+            border-color: var(--color-replay);
+            color: white;
+        }

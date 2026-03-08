@@ -1,0 +1,226 @@
+        /* 메인 컨테이너: 네비게이션 바 아래의 전체 영역 */
+        .main-container {
+            flex: 1;  /* 남은 공간 모두 차지 */
+            padding: 0;
+            overflow: hidden;  /* 스크롤 방지 */
+        }
+
+        /* 지도 컨테이너: 지도와 패널들을 포함하는 영역 */
+        .map-container {
+            background: var(--bg-secondary);  /* 어두운 배경 */
+            border: 1px solid var(--bg-tertiary);
+            border-radius: 0;
+            padding: 0;
+            position: relative;  /* 자식 요소의 절대 위치 기준 */
+            width: 100%;
+            height: calc(100vh - 95px);  /* 화면 전체 높이 - 네비게이션 및 알림 바 높이 */
+        }
+
+        /* 서울시 지도 SVG 영역 */
+        .seoul-map {
+            width: 100%;
+            height: calc(100% - 60px);  /* 하단 범례 공간 제외 */
+            display: flex;
+            justify-content: center;  /* 지도 중앙 정렬 */
+            align-items: center;
+            cursor: grab;  /* 손 모양 커서 (드래그 가능) */
+            position: relative;
+        }
+
+        /* 지도 드래그 중 커서 */
+        .seoul-map:active {
+            cursor: grabbing;  /* 잡는 손 모양 */
+        }
+
+        /* 지도 SVG 요소 */
+        .seoul-map svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 구(區) 영역 패스: 서울시 25개 구의 배경 영역 */
+        .district-path {
+            fill: #243552;  /* 기본 어두운 남색 배경 */
+            stroke: none;
+            cursor: pointer;  /* 클릭 가능 표시 */
+            transform-origin: center;  /* 변형의 중심점 */
+            transform-box: fill-box;   /* 변형 기준 박스 */
+            transition: filter 0.3s ease-out;  /* 부드러운 밝기 전환 */
+        }
+
+        /* 구 호버 펄스 애니메이션 활성화 (JavaScript에서 클래스 추가) */
+        .district-path.hover-pulse-active {
+            animation: hoverPulse 0.7s ease-in-out forwards;  /* 0.7초 동안 두근 효과 */
+        }
+
+        /* 구 영역에 마우스 올렸을 때 은은한 빛 효과 유지 */
+        /* 최적화: brightness → opacity로 GPU 가속 활용 */
+        .district-path:hover {
+            opacity: 0.9;
+            filter: drop-shadow(0 0 6px rgba(0, 217, 255, 0.4));  /* 청록색 빛 */
+        }
+
+        /* 구(區) 경계선: 온도에 따라 색상이 변하는 테두리 */
+        .district-stroke {
+            fill: none;  /* 채우기 없음 (테두리만) */
+            stroke-width: 4;  /* 테두리 두께 */
+            pointer-events: none;  /* 클릭 이벤트 무시 */
+            transition: all 0.3s ease;  /* 부드러운 색상 전환 */
+        }
+
+        /* 온도 구간별 경계선 색상 (구와 동 공통 적용) */
+
+        /* 영하/추움 (파란색) */
+        .district-stroke.level-cold, .dong-stroke.level-cold {
+            stroke: var(--color-cold);
+            filter: drop-shadow(0 0 3px rgba(52, 152, 219, 0.8));
+        }
+
+        /* 서늘함 (청록색) */
+        .district-stroke.level-cool, .dong-stroke.level-cool {
+            stroke: var(--color-cool);
+            filter: drop-shadow(0 0 3px rgba(0, 217, 255, 0.6));
+        }
+
+        /* 쾌적함 (초록색) */
+        .district-stroke.level-good, .dong-stroke.level-good {
+            stroke: var(--color-good);
+            filter: drop-shadow(0 0 3px rgba(46, 204, 113, 0.6));
+        }
+
+        /* 더움 (주황색) */
+        .district-stroke.level-bad, .dong-stroke.level-bad {
+            stroke: var(--color-bad);
+            filter: drop-shadow(0 0 5px rgba(243, 156, 18, 0.7));
+        }
+
+        /* 폭염 (빨간색 + 깜빡임 경고 효과) */
+        .district-stroke.level-danger, .dong-stroke.level-danger {
+            stroke: var(--color-danger-alt);
+            filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.8));
+            animation: dangerPulse 1.5s ease-in-out infinite;  /* 위험 깜빡임 */
+        }
+
+        /* 데이터 없음 (회색) */
+        .district-stroke.level-unknown, .dong-stroke.level-unknown {
+            stroke: var(--color-neutral);
+            filter: drop-shadow(0 0 2px rgba(127, 140, 141, 0.5));
+        }
+
+        .district-label {
+            font-weight: bold;
+            fill: #e8e8e8;
+            pointer-events: none;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            text-shadow: 1px 1px 2px #0a0f1a, -1px -1px 2px #0a0f1a, 1px -1px 2px #0a0f1a, -1px 1px 2px #0a0f1a;
+        }
+
+        .dong-path {
+            fill: #243552;
+            stroke: none;
+            cursor: pointer;
+            transform-origin: center;
+            transform-box: fill-box;
+            transition: filter 0.3s ease-out;
+        }
+
+        .dong-overlay-path {
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+
+        /* 동 배경 (두근 효과 적용 대상) */
+        .dong-fill {
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+
+        /* 동 Hover pulse 애니메이션 - 단발성 두근 효과만 */
+        .dong-path.hover-pulse-active,
+        .dong-fill.hover-pulse-active {
+            animation: dongHoverPulse 0.7s ease-in-out forwards;
+        }
+
+        .dong-path.selected,
+        .dong-overlay-path.selected {
+            filter: drop-shadow(0 0 8px rgba(0, 217, 255, 0.8));
+        }
+
+        .dong-stroke {
+            fill: none;
+            stroke-width: 2.5;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        /* 오버레이 동 경계선: 은은한 glow만 */
+        .dong-overlay-border.dong-stroke {
+            animation: none !important;
+        }
+
+        /* 동 분리선 (어두운 색) */
+        .dong-border {
+            fill: none;
+            pointer-events: none;
+            stroke-linejoin: round;
+        }
+
+        .dong-label {
+            font-weight: bold;
+            fill: #e8e8e8;
+            pointer-events: none;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            text-shadow: 1px 1px 2px #0a0f1a, -1px -1px 2px #0a0f1a, 1px -1px 2px #0a0f1a, -1px 1px 2px #0a0f1a;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-20px);
+        }
+
+        .back-button.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+
+        .back-button:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .zoom-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-secondary);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+            transition: opacity 0.5s ease-in-out;
+            border-radius: 12px;
+        }
+
+        .zoom-overlay.active {
+            opacity: 1;
+        }

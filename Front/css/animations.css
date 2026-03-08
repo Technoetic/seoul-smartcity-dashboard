@@ -1,0 +1,130 @@
+/* 기본 펄스 애니메이션: 투명도를 반복적으로 변경하여 깜빡이는 효과 (실시간 상태 표시 점에 사용) */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }    /* 완전 불투명 */
+    50% { opacity: 0.5; }       /* 반투명 */
+}
+
+/* Replay 패널 펄스 애니메이션: 보라색으로 빛나며 살짝 커지는 효과 */
+@keyframes replayPulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(155, 89, 182, 0.5);  /* 은은한 보라색 그림자 */
+        border-color: var(--color-replay);
+        transform: scale(1);  /* 원래 크기 */
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(155, 89, 182, 0.9), 0 0 40px rgba(155, 89, 182, 0.5);  /* 강한 빛 */
+        border-color: #bb6bd9;  /* 밝은 보라색 */
+        transform: scale(1.05);  /* 5% 확대 */
+    }
+}
+
+/* Replay 상태 점 펄스: 작아졌다가 커지는 효과 */
+@keyframes replayDotPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);  /* 원래 크기 */
+        box-shadow: 0 0 8px rgba(155, 89, 182, 0.8);
+    }
+    50% {
+        opacity: 0.6;  /* 반투명 */
+        transform: scale(0.7);  /* 70% 축소 */
+        box-shadow: 0 0 15px rgba(155, 89, 182, 1);
+    }
+}
+
+/* 지역 진입 연출: 작게 시작해서 크게 나타나는 줌인 효과 */
+@keyframes locationZoomIn {
+    0% {
+        transform: scale(0.8);  /* 80% 크기에서 시작 */
+        opacity: 0;             /* 투명 */
+    }
+    100% {
+        transform: scale(1);    /* 원래 크기 */
+        opacity: 1;             /* 완전 불투명 */
+    }
+}
+
+/* 지역 진입 연출: 아래에서 위로 페이드 인 효과 */
+@keyframes locationFadeIn {
+    0% {
+        opacity: 0;                     /* 투명 */
+        transform: translateY(10px);    /* 10px 아래에서 시작 */
+    }
+    100% {
+        opacity: 1;                     /* 완전 불투명 */
+        transform: translateY(0);       /* 원래 위치 */
+    }
+}
+
+/* 알림 텍스트 스크롤: 오른쪽에서 왼쪽으로 흐르는 효과 */
+@keyframes scrollText {
+    0% { transform: translateX(0); }      /* 원래 위치 */
+    100% { transform: translateX(-100%); }  /* 왼쪽으로 완전히 이동 */
+}
+
+/* 구(區) 호버 펄스: 마우스 올리면 밝아지고 커지는 두근 효과 */
+/* 최적화: brightness를 opacity로 대체하여 렌더링 성능 향상 */
+@keyframes hoverPulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);  /* 원래 크기 */
+    }
+    50% {
+        opacity: 0.85;
+        transform: scale(1.045);  /* 4.5% 확대 */
+        filter: drop-shadow(0 0 15px rgba(0, 217, 255, 0.8));  /* 청록색 빛 */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);  /* 원래 크기로 복귀 */
+    }
+}
+
+/* 위험 구간 펄스: 빨간색으로 깜빡이는 경고 효과 (폭염 지역) */
+@keyframes dangerPulse {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.8)); }  /* 은은한 빨간 빛 */
+    50% { filter: drop-shadow(0 0 12px rgba(231, 76, 60, 1)); }        /* 강한 빨간 빛 */
+}
+
+/* 동(洞) 호버 펄스: 구보다 더 강한 두근 효과 (더 밝고 크게) */
+/* 최적화: brightness를 opacity로 대체 */
+@keyframes dongHoverPulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.06);  /* 6% 확대 */
+        filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.9));
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 회전 애니메이션: 로딩 스피너에 사용 (시계방향 무한 회전) */
+@keyframes spin {
+    0% { transform: rotate(0deg); }    /* 0도 */
+    100% { transform: rotate(360deg); }  /* 360도 (한 바퀴) */
+}
+
+/* 경고 센서 펄스: 주황색으로 깜빡이는 주의 효과 */
+@keyframes warningPulse {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(243, 156, 18, 0.7)); }  /* 은은한 주황 빛 */
+    50% { filter: drop-shadow(0 0 10px rgba(243, 156, 18, 1)); }        /* 강한 주황 빛 */
+}
+
+/* 위험 센서 펄스: 빨간색으로 깜빡이며 크기도 변하는 강한 경고 효과 */
+@keyframes dangerSensorPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.8));  /* 은은한 빨간 빛 */
+        r: 5;  /* SVG 원 반지름 5 */
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(231, 76, 60, 1));  /* 강한 빨간 빛 */
+        r: 7;  /* SVG 원 반지름 7 (커짐) */
+    }
+}
+

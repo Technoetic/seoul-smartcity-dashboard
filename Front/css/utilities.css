@@ -1,0 +1,94 @@
+/* 인라인 스타일 대체 클래스: 자주 사용되는 스타일을 클래스로 정의 */
+
+/* 네비게이션 바 로고 아이콘 크기 */
+.navbar-logo-icon { font-size: 2rem; }
+
+/* 초기 숨김 상태 (JavaScript로 나중에 표시) */
+.hidden-initial { display: none; }
+
+/* API 상태 배지 (OFFLINE 등) */
+.api-status-badge { font-size: 0.75rem; background: #c0392b; color: #ffffff; padding: 3px 8px; border-radius: 4px; margin-left: 8px; }
+
+/* 바람 정보 구분선 */
+.wind-section-divider { border-top: 1px solid var(--bg-tertiary); margin-top: 12px; padding-top: 12px; }
+
+/* 바람 정보 헤더 행 */
+.wind-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+/* 바람 레이블 */
+.wind-label { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
+
+/* 풍향 텍스트 (예: 남동풍) */
+.wind-direction-text { color: var(--accent); font-weight: bold; font-size: 1rem; }
+
+/* 바람 방향 나침반 컨테이너 */
+.wind-arrow-container { display: flex; align-items: center; justify-content: center; margin-top: 12px; }
+
+/* 범례 제목 (실시간 온도) */
+.legend-title { color: var(--text-secondary); font-size: 0.8rem; margin-right: 0.5rem; }
+
+/* 센서 타입 범례 제목 */
+.legend-sensor-title { color: var(--text-secondary); font-size: 0.8rem; margin: 0 0.5rem 0 1rem; }
+/* 범례 색상 박스 - 온도 구간별 */
+/* 영하/추움 (파란색 테두리) */
+.legend-color-cold { background: var(--color-district-bg); border: 2px solid var(--color-cold); box-shadow: 0 0 4px rgba(52, 152, 219, 0.6); }
+
+/* 서늘함 (청록색 테두리) */
+.legend-color-cool { background: var(--color-district-bg); border: 2px solid var(--color-cool); box-shadow: 0 0 4px rgba(0, 217, 255, 0.6); }
+
+/* 쾌적함 (초록색 테두리) */
+.legend-color-good { background: var(--color-district-bg); border: 2px solid var(--color-good); box-shadow: 0 0 4px rgba(46, 204, 113, 0.6); }
+
+/* 더움 (주황색 테두리) */
+.legend-color-bad { background: var(--color-district-bg); border: 2px solid var(--color-bad); box-shadow: 0 0 5px rgba(243, 156, 18, 0.7); }
+
+/* 폭염 (빨간색 테두리) */
+.legend-color-danger { background: var(--color-district-bg); border: 2px solid var(--color-danger-alt); box-shadow: 0 0 6px rgba(231, 76, 60, 0.8); }
+
+/* 데이터 없음 (회색 테두리) */
+.legend-color-nodata { background: var(--color-district-bg); border: 2px solid var(--color-neutral); box-shadow: 0 0 3px rgba(127, 140, 141, 0.5); }
+
+/* 범례 색상 박스 - 센서 타입별 */
+/* V02Q 센서 (초록색 배경 + 흰색 테두리 + 원형) */
+.legend-sensor-v02q { background: var(--color-good); border: 2px solid #ffffff; border-radius: 50%; }
+
+/* OC3 센서 (초록색 배경 + 청록색 테두리 + 원형 + 빛 효과) */
+.legend-sensor-oc3 { background: var(--color-good); border: 2px solid var(--accent); border-radius: 50%; box-shadow: 0 0 4px rgba(0, 217, 255, 0.6); }
+
+/* 센서 툴팁 내부 클래스: 센서에 마우스 올릴 때 표시되는 정보창 */
+
+/* 툴팁 섹션 구분선 */
+.tooltip-section { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0, 217, 255, 0.3); }
+
+/* 대기 중 상태 섹션 */
+.tooltip-section.waiting { border-top-color: rgba(127, 140, 141, 0.3); }
+
+/* 섹션 제목 */
+.tooltip-section-title { font-weight: bold; color: var(--accent); margin-bottom: 4px; font-size: 10px; }
+
+/* 2열 그리드 레이아웃 (레이블 + 값) */
+.tooltip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; font-size: 9px; }
+
+/* 툴팁 레이블 (온도, 습도 등) */
+.tooltip-label { color: var(--text-secondary); }
+
+/* 데이터 시간 표시 */
+.tooltip-time { margin-top: 4px; font-size: 8px; color: var(--accent); }
+
+/* 대기 중 메시지 제목 */
+.tooltip-waiting-title { font-weight: bold; color: var(--color-neutral); margin-bottom: 4px; font-size: 10px; }
+
+/* 대기 중 메시지 내용 */
+.tooltip-waiting-msg { font-size: 9px; color: #666; }
+
+/* 이상치 정보 구분선 */
+.tooltip-abnormal-separator { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); }
+
+/* 이상치 제목 */
+.tooltip-abnormal-title { font-weight: bold; margin-bottom: 4px; }
+
+/* 이상치 항목 */
+.tooltip-abnormal-item { font-size: 10px; margin: 2px 0; }
+
+/* 클릭 힌트 메시지 (발원지 추적 안내 등) */
+.tooltip-click-hint { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); color: var(--color-replay); font-size: 10px; }

@@ -1,0 +1,178 @@
+        /* 패널 공통 스타일: 모든 정보 패널(환경정보, 센서 토글, Replay)에 적용 */
+        .panel-box {
+            position: absolute;  /* 지도 위에 떠있는 패널 */
+            right: 20px;  /* 오른쪽 여백 */
+            background: var(--bg-panel);  /* 반투명 어두운 배경 */
+            border-radius: 10px;  /* 둥근 모서리 */
+            z-index: 100;  /* 지도 위에 표시 */
+            width: 330px;  /* 고정 너비 */
+            box-shadow: var(--shadow-panel);  /* 그림자 효과 */
+        }
+
+        /* 환경정보 박스: 온도, 습도, 소음, 바람 정보 표시 */
+        .info-box {
+            top: 78px;  /* 상단에서 78px 아래 */
+            border: 1px solid var(--accent);  /* 청록색 테두리 */
+            padding: 1.25rem;
+        }
+
+        /* 센서 토글 패널 */
+        .sensor-toggle-panel {
+            top: 20px;
+            border: 1px solid var(--accent);
+            padding: 0;
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .sensor-toggle-panel .panel-title {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 0.7rem;
+            padding: 0.55rem 0.6rem 0.55rem 0.8rem;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sensor-label-btn {
+            flex: 1;
+            font-size: 0.7rem;
+            color: var(--text-primary);
+            background: transparent;
+            border: none;
+            border-left: 1px solid var(--bg-tertiary);
+            border-radius: 0;
+            padding: 0.55rem 0;
+            cursor: pointer;
+            transition: color 0.15s, background 0.15s;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            position: relative;
+            font-weight: 500;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .sensor-label-btn::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+            transition: opacity 0.15s;
+        }
+
+        #toggleAsos::before { background: #e74c3c; opacity: 1; }
+        #toggleAws::before { background: #9b59b6; opacity: 1; }
+        #toggleRtd::before { background: #f39c12; opacity: 1; }
+        #toggleSdot::before { background: #2ecc71; opacity: 1; }
+
+        .sensor-label-btn:hover {
+            color: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sensor-label-btn:hover::before {
+            opacity: 0.7 !important;
+        }
+
+        .sensor-label-btn.active {
+            color: #fff;
+        }
+
+        #toggleAsos.active { background: rgba(231, 76, 60, 0.25); }
+        #toggleAws.active { background: rgba(155, 89, 182, 0.25); }
+        #toggleRtd.active { background: rgba(243, 156, 18, 0.25); }
+        #toggleSdot.active { background: rgba(46, 204, 113, 0.25); }
+
+        #toggleAsos.active::before { opacity: 1 !important; }
+        #toggleAws.active::before { opacity: 1 !important; }
+        #toggleRtd.active::before { opacity: 1 !important; }
+        #toggleSdot.active::before { opacity: 1 !important; }
+
+        /* 토글 스위치: ON/OFF 전환 가능한 스위치 (Replay, 센서 표시 등) */
+        .toggle-switch {
+            position: relative;
+            width: var(--toggle-w, 44px);  /* CSS 변수로 크기 조절 가능 */
+            height: var(--toggle-h, 22px);
+            background: var(--bg-tertiary);  /* OFF 상태: 어두운 배경 */
+            border-radius: calc(var(--toggle-h, 22px) / 2);  /* 완전히 둥근 모서리 */
+            cursor: pointer;
+            transition: background 0.3s ease;  /* 부드러운 색상 전환 */
+        }
+
+        /* 토글 활성화 상태 (ON) */
+        .toggle-switch.active {
+            background: var(--color-replay);  /* 보라색 배경 */
+        }
+
+        /* 토글 스위치 손잡이 (흰색 동그라미) */
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: var(--toggle-thumb, 18px);
+            height: var(--toggle-thumb, 18px);
+            background: white;  /* 흰색 손잡이 */
+            border-radius: 50%;  /* 원형 */
+            transition: transform 0.3s ease;  /* 부드러운 이동 */
+        }
+
+        /* 토글 활성화 시 손잡이 오른쪽으로 이동 */
+        .toggle-switch.active::after {
+            transform: translateX(var(--toggle-travel, 22px));  /* 이동 거리 */
+        }
+
+        /* 소형 토글 스위치 (센서 토글용) - CSS 변수 오버라이드 */
+        .toggle-switch-sm {
+            --toggle-w: 36px;      /* 너비 36px */
+            --toggle-h: 18px;      /* 높이 18px */
+            --toggle-thumb: 14px;  /* 손잡이 크기 14px */
+            --toggle-travel: 18px; /* 이동 거리 18px */
+        }
+
+        /* 토글 활성화 색상은 .sensor-label-btn.active 에서 관리 */
+
+        /* 관측소 마커 스타일 */
+        .station-marker-asos {
+            fill: #e74c3c;
+            stroke: #ffffff;
+            stroke-width: 1.5;
+        }
+
+        .station-marker-aws {
+            fill: var(--color-replay);
+            stroke: #ffffff;
+            stroke-width: 1.5;
+        }
+
+        .info-title {
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            font-size: 1rem;
+        }
+
+        .info-row span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .info-row span:last-child {
+            font-weight: 500;
+        }

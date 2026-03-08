@@ -1,0 +1,153 @@
+        /* 상단 네비게이션 바 전체 영역 */
+        .navbar {
+            height: 60px;  /* 고정 높이 */
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);  /* 그라데이션 배경 */
+            display: flex;
+            justify-content: space-between;  /* 좌우 양쪽 정렬 */
+            align-items: center;
+            padding: 0 2rem;
+            border-bottom: 1px solid var(--bg-tertiary);  /* 하단 테두리 */
+        }
+
+        /* 왼쪽 브랜드 영역: 로고와 제목 */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;  /* 로고와 제목 사이 간격 */
+        }
+
+        /* 대시보드 제목 */
+        .navbar-brand h1 {
+            font-size: 1.5rem;
+            color: var(--accent);  /* 청록색 강조 */
+        }
+
+        /* 오른쪽 상태 표시 영역 */
+        .navbar-status {
+            display: flex;
+            align-items: center;
+            gap: 2rem;  /* 각 상태 표시 사이 간격 */
+        }
+
+        /* 실시간 연결 상태 표시 */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;  /* 점과 텍스트 사이 간격 */
+        }
+
+        /* 실시간 상태 점 (초록색 깜빡임) */
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;  /* 원형 */
+            background: var(--success);  /* 초록색 */
+            animation: pulse 2s infinite;  /* 2초 주기로 깜빡임 */
+        }
+
+        /* HTTP 응답 상태 표시 (200 OK, 느림, 에러 등) */
+        .http-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 184, 148, 0.15);  /* 반투명 초록 배경 */
+            border: 1px solid var(--success);
+            border-radius: 20px;  /* 둥근 모서리 */
+            font-size: 0.8rem;
+            transition: all 0.3s ease;  /* 부드러운 색상 전환 */
+        }
+
+        /* HTTP 상태 정상 (200 OK) - 초록색 */
+        .http-status.ok {
+            background: rgba(0, 184, 148, 0.15);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* HTTP 상태 느림 (응답 지연) - 노란색 */
+        .http-status.slow {
+            background: rgba(253, 203, 110, 0.15);
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        /* HTTP 상태 에러 (연결 실패) - 빨간색 */
+        .http-status.error {
+            background: rgba(225, 112, 85, 0.15);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* HTTP 상태 점 */
+        .http-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;  /* 원형 */
+            background: var(--success);  /* 기본 초록색 */
+        }
+
+        /* 상태별 점 색상 */
+        .http-status.ok .http-status-dot {
+            background: var(--success);  /* 초록 */
+        }
+
+        .http-status.slow .http-status-dot {
+            background: var(--warning);  /* 노란 */
+        }
+
+        .http-status.error .http-status-dot {
+            background: var(--danger);  /* 빨강 */
+            animation: none;  /* 에러 시 애니메이션 중지 */
+        }
+
+        /* 데이터 갱신 시간 표시 */
+        .data-refresh-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 217, 255, 0.1);  /* 반투명 청록 배경 */
+            border: 1px solid var(--accent);
+            border-radius: 20px;  /* 둥근 모서리 */
+            font-size: 0.8rem;
+            color: var(--accent);  /* 청록색 텍스트 */
+        }
+
+        /* Replay 시간 표시기 (상단 navbar) - Replay 모드 활성화 시 표시 */
+        .replay-time-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.4), rgba(142, 68, 173, 0.3));  /* 보라색 그라데이션 */
+            border: 2px solid var(--color-replay);  /* 보라색 테두리 */
+            border-radius: 20px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            font-weight: bold;
+            animation: replayPulse 1.2s ease-in-out infinite;  /* 깜빡이는 효과 */
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.6);  /* 보라색 빛 */
+        }
+
+        /* Replay 모드 상태 점 (보라색 깜빡임) */
+        .replay-indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;  /* 원형 */
+            background: var(--color-replay);  /* 보라색 */
+            animation: replayDotPulse 0.6s ease-in-out infinite;  /* 빠른 깜빡임 */
+            box-shadow: 0 0 8px rgba(155, 89, 182, 0.8);
+        }
+
+        /* Replay 시간 텍스트 (HH:MM:SS 형식) */
+        #replayTimeDisplay {
+            font-family: 'Consolas', 'Monaco', monospace;  /* 고정폭 폰트 (디지털 시계 느낌) */
+            font-size: 1.1rem;
+            color: #ffffff;
+            margin-left: 0.5rem;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);  /* 빛나는 효과 */
+            transition: transform 0.2s ease, color 0.2s ease;
+            font-weight: bold;
+            letter-spacing: 1px;  /* 글자 간격 */
+        }

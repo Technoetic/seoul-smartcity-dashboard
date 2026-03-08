@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- 문자 인코딩 및 뷰포트 설정 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S-DoT 서울 스마트시티 대시보드</title>
+    <!-- 파비콘 (브라우저 탭 아이콘) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌆</text></svg>">
+    <!-- 통합 CSS 파일 로드 -->
+    <link rel="stylesheet" href="css/style.css?v=36">
+</head>
+<body>
+    <!-- 상단 네비게이션 바: 로고, 제목, 상태 표시 -->
+    <nav class="navbar">
+        <!-- 브랜드 영역: 로고 아이콘과 대시보드 제목 -->
+        <div class="navbar-brand">
+            <span class="navbar-logo-icon">🌆</span>
+            <h1>S-DoT 서울 스마트시티 대시보드</h1>
+        </div>
+        <!-- 상태 표시 영역: 실시간 연결 상태, HTTP 상태, 데이터 갱신 시간 등 -->
+        <div class="navbar-status">
+            <!-- 실시간 연결 상태 표시 (초록색 점) -->
+            <div class="status-indicator" id="liveStatusIndicator">
+                <div class="status-dot"></div>
+                <span>실시간 연결됨</span>
+            </div>
+            <!-- Replay 모드 시간 표시 (보라색, 초기엔 숨김) -->
+            <div class="replay-time-indicator hidden-initial" id="replayTimeIndicator">
+                <div class="replay-indicator-dot"></div>
+                <span>⏪ REPLAY</span>
+                <span id="replayTimeDisplay">--:--:--</span>
+            </div>
+            <!-- HTTP 응답 상태 표시 (200 OK, 느림, 에러 등) -->
+            <div class="http-status ok" id="httpStatus">
+                <div class="http-status-dot"></div>
+                <span id="httpStatusText">HTTP 200 OK</span>
+                <span id="httpLatency">(--ms)</span>
+            </div>
+            <!-- 데이터 갱신 시간 표시 -->
+            <div class="data-refresh-time" id="dataRefreshTime">
+                <span>데이터 갱신:</span>
+                <span id="lastDataTime">--:--:--</span>
+            </div>
+            <!-- 현재 시간 표시 -->
+            <div id="currentTime">2026-01-30 15:30:00</div>
+        </div>
+    </nav>
+
+    <!-- 지역 진입 연출 오버레이: 구/동 클릭 시 화면 중앙에 크게 표시되는 애니메이션 -->
+    <div class="location-announce" id="locationAnnounce">
+        <div class="district-name" id="announceDistrict"></div>
+        <div class="dong-name" id="announceDong"></div>
+        <div class="subtitle" id="announceSubtitle"></div>
+    </div>
+
+    <!-- 알림 바: 대기오염 등 중요 알림을 상단에 흐르는 텍스트로 표시 -->
+    <div class="alert-bar" id="alertBar">
+        <span class="alert-text" id="alertText">현재 강남구, 송파구 PM2.5 농도가 '나쁨' 수준입니다. 외출 시 마스크 착용을 권장합니다.</span>
+    </div>
+
+    <!-- 메인 컨테이너: 지도 및 패널들을 포함하는 영역 -->
+    <main class="main-container">
+        <div class="map-container">
+            <!-- 센서 토글 패널: ASOS/AWS/S-DoT 센서 표시 여부를 ON/OFF 할 수 있는 패널 -->
+            <div class="panel-box sensor-toggle-panel" id="sensorTogglePanel">
+                <div class="panel-title">센서 표시</div>
+                <button class="sensor-label-btn" id="toggleAsos" aria-pressed="false" aria-label="ASOS 관측소 표시 토글">ASOS</button>
+                <button class="sensor-label-btn" id="toggleAws" aria-pressed="false" aria-label="AWS 관측소 표시 토글">AWS</button>
+                <button class="sensor-label-btn" id="toggleRtd" aria-pressed="false" aria-label="RTD 실시간 도시데이터 표시 토글">RTD</button>
+                <button class="sensor-label-btn" id="toggleSdot" aria-pressed="false" aria-label="S-DoT 센서 표시 토글">S-DoT</button>
+            </div>
+
+            <!-- 실시간 환경정보 박스: 선택된 지역의 온도, 습도, 소음, 바람 정보 표시 -->
+            <div class="panel-box info-box" id="infoBox">
+                <div class="info-title">실시간 환경정보 <span id="apiStatusBadge" class="api-status-badge">OFFLINE</span></div>
+                <!-- 선택된 지역명 -->
+                <div class="info-row"><span>지역</span><span id="infoName">-</span></div>
+                <!-- 현재 온도 (섭씨) -->
+                <div class="info-row"><span>온도</span><span id="infoTemp">- °C</span></div>
+                <!-- 현재 습도 (%) -->
+                <div class="info-row"><span>습도</span><span id="infoHumidity">- %</span></div>
+                <!-- 현재 소음 (데시벨) -->
+                <div class="info-row"><span>소음</span><span id="infoNoise">- dB</span></div>
+                <!-- 바람 정보 섹션: 풍향과 풍속을 표시 -->
+                <div class="wind-section-divider">
+                    <div class="wind-header-row">
+                        <span class="wind-label">바람</span>
+                        <!-- 풍향 (예: 남동풍) -->
+                        <span id="infoWindDir" class="wind-direction-text">-</span>
+                    </div>
+                    <!-- 풍속 (m/s) -->
+                    <div class="info-row"><span>풍속</span><span id="infoWindSpeed">- m/s</span></div>
+                    <!-- 바람 방향 나침반: SVG로 시각적으로 풍향 표시 -->
+                    <div id="windArrowContainer" class="wind-arrow-container">
+                        <svg width="70" height="70" viewBox="-35 -35 70 70" aria-label="바람 방향 나침반" role="img">
+                            <!-- 나침반 원 -->
+                            <circle r="30" fill="none" stroke="#0f3460" stroke-width="1.5"/>
+                            <!-- 방위 텍스트: 북/동/남/서 -->
+                            <text x="0" y="-22" text-anchor="middle" fill="#a0a0a0" font-size="10">북</text>
+                            <text x="22" y="4" text-anchor="middle" fill="#a0a0a0" font-size="10">동</text>
+                            <text x="0" y="28" text-anchor="middle" fill="#a0a0a0" font-size="10">남</text>
+                            <text x="-22" y="4" text-anchor="middle" fill="#a0a0a0" font-size="10">서</text>
+                            <!-- 바람 방향 화살표 (JavaScript에서 회전 각도 조정) -->
+                            <path id="infoWindArrow" d="M0,-20 L5,0 L2.5,0 L2.5,14 L-2.5,14 L-2.5,0 L-5,0 Z" fill="#00d9ff" transform="rotate(45)"/>
+                            <!-- 중앙 점 -->
+                            <circle r="3" fill="#00d9ff"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Replay 박스: 과거 데이터를 다시 재생할 수 있는 컨트롤 패널 -->
+            <div class="panel-box replay-box" id="replayBox">
+                <div class="replay-title">
+                    <span>⏪ Replay</span>
+                    <!-- Replay 모드 ON/OFF 토글 스위치 -->
+                    <div class="replay-toggle">
+                        <div class="toggle-switch" id="replayToggle" role="switch" aria-checked="false" aria-label="Replay 모드 토글" tabindex="0"></div>
+                    </div>
+                </div>
+                <!-- Replay 컨트롤 영역 (토글 ON 시 표시) -->
+                <div class="replay-content" id="replayContent">
+                    <!-- 날짜 선택 -->
+                    <div class="replay-date-row">
+                        <input type="date" class="replay-date-input" id="replayDate" aria-label="재생할 날짜 선택">
+                    </div>
+                    <!-- 시간 선택 섹션 -->
+                    <div class="replay-time-section">
+                        <div class="replay-time-label">
+                            <span>시간</span>
+                            <!-- 선택된 시간 표시 -->
+                            <span class="replay-time-value" id="replayTimeValue">12:00</span>
+                        </div>
+                        <!-- 시간 슬라이더 (0시~23시) -->
+                        <input type="range" class="replay-slider" id="replaySlider" min="0" max="23" value="12" aria-label="재생 시간 선택 (0시~23시)" aria-valuemin="0" aria-valuemax="23" aria-valuenow="12">
+                        <!-- 슬라이더 눈금 표시 -->
+                        <div class="replay-time-marks">
+                            <span>00시</span>
+                            <span>06시</span>
+                            <span>12시</span>
+                            <span>18시</span>
+                            <span>23시</span>
+                        </div>
+                    </div>
+                    <!-- Replay 재생 컨트롤 버튼 -->
+                    <div class="replay-controls">
+                        <!-- 1시간 전으로 이동 -->
+                        <button class="replay-btn" id="replayPrevBtn" title="1시간 전" aria-label="1시간 전으로 이동">
+                            ◀◀
+                        </button>
+                        <!-- 자동 재생 (시간 순서대로 자동으로 넘김) -->
+                        <button class="replay-btn" id="replayPlayBtn" title="자동 재생" aria-label="자동 재생">
+                            ▶
+                        </button>
+                        <!-- 1시간 후로 이동 -->
+                        <button class="replay-btn" id="replayNextBtn" title="1시간 후" aria-label="1시간 후로 이동">
+                            ▶▶
+                        </button>
+                    </div>
+                    <!-- Replay 재생 속도 조절 -->
+                    <div class="replay-speed-controls" id="replaySpeedControls">
+                        <span class="replay-speed-label">속도</span>
+                        <button class="replay-speed-btn" data-speed="0.5" aria-label="0.5배속">0.5x</button>
+                        <button class="replay-speed-btn active" data-speed="1" aria-label="1배속">1x</button>
+                        <button class="replay-speed-btn" data-speed="2" aria-label="2배속">2x</button>
+                    </div>
+                    <!-- Replay 상태 메시지 -->
+                    <div class="replay-status" id="replayStatus">날짜를 선택하세요</div>
+                </div>
+            </div>
+
+            <!-- 뒤로가기 버튼: 동(洞) 확대 상태에서 서울시 전체로 돌아가는 버튼 -->
+            <button class="back-button" id="backButton" aria-label="서울시 전체보기로 돌아가기">
+                <span>←</span> 서울시 전체보기
+            </button>
+            <!-- 줌 전환 시 오버레이 (부드러운 화면 전환 효과) -->
+            <div class="zoom-overlay" id="zoomOverlay"></div>
+            <!-- 서울시 지도 영역: D3.js로 SVG 지도를 그리는 영역 -->
+            <div class="seoul-map" id="seoulMap">
+                <!-- 지도 로딩 중 표시 -->
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <span>지도 로딩 중...</span>
+                </div>
+            </div>
+            <!-- 지도 범례: 온도 구간별 색상과 센서 타입 표시 -->
+            <div class="map-legend">
+                <!-- 온도 범례 제목 -->
+                <span class="legend-title">실시간 온도 (°C)</span>
+                <!-- 온도 구간별 색상 표시 -->
+                <div class="legend-item">
+                    <div class="legend-color legend-color-cold"></div>
+                    <span>영하 (&lt;0)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-color-cool"></div>
+                    <span>서늘 (0-10)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-color-good"></div>
+                    <span>쾌적 (10-25)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-color-bad"></div>
+                    <span>더움 (25-35)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-color-danger"></div>
+                    <span>폭염 (35+)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-color-nodata"></div>
+                    <span>데이터없음</span>
+                </div>
+                <!-- 센서 타입 범례 제목 -->
+                <span class="legend-sensor-title">센서 타입</span>
+                <!-- S-DoT 센서 모델별 표시 -->
+                <div class="legend-item">
+                    <div class="legend-color legend-sensor-v02q"></div>
+                    <span>V02Q</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-sensor-oc3"></div>
+                    <span>OC3</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- D3.js 라이브러리 (지도 시각화용) -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- 설정 파일 -->
+    <script src="js/config.js?v=4" defer></script>
+    <!-- 유틸리티 함수 -->
+    <script src="js/utils.js?v=5" defer></script>
+    <!-- 이상치 감지 로직 -->
+    <script src="js/anomaly.js?v=3" defer></script>
+    <!-- API 통신 모듈 -->
+    <script src="js/api.js?v=3" defer></script>
+    <!-- 바람 시각화 모듈 -->
+    <script src="js/wind.js?v=3" defer></script>
+    <!-- 센서 마커 표시 모듈 -->
+    <script src="js/sensor-markers.js?v=3" defer></script>
+    <!-- 정보 박스 UI 모듈 -->
+    <script src="js/ui-info.js?v=1" defer></script>
+    <!-- 발원지 역추적 UI 모듈 -->
+    <script src="js/ui-traceback.js?v=1" defer></script>
+    <!-- 툴팁 UI 모듈 -->
+    <script src="js/ui-tooltip.js?v=1" defer></script>
+    <!-- 지도 기본 모듈 -->
+    <script src="js/map.js?v=5" defer></script>
+    <!-- 동(洞) 오버레이 모듈 -->
+    <script src="js/dong-overlay.js?v=16" defer></script>
+    <!-- 동(洞) 마커 표시 모듈 -->
+    <script src="js/dong-markers.js?v=1" defer></script>
+    <!-- 동(洞) 줌 기능 모듈 -->
+    <script src="js/dong-zoom.js?v=1" defer></script>
+    <!-- 뷰 전환 모듈 -->
+    <script src="js/view.js?v=3" defer></script>
+    <!-- 지역 진입 연출 모듈 -->
+    <script src="js/location.js?v=3" defer></script>
+    <!-- 센서 레이어 모듈 -->
+    <script src="js/sensor-layer.js?v=4" defer></script>
+    <!-- Replay 모드 모듈 -->
+    <script src="js/replay-mode.js?v=1" defer></script>
+    <!-- Replay 데이터 처리 모듈 -->
+    <script src="js/replay-data.js?v=1" defer></script>
+    <!-- Replay UI 모듈 -->
+    <script src="js/replay-ui.js?v=1" defer></script>
+    <!-- HTTP 상태 모니터링 모듈 -->
+    <script src="js/http-status.js?v=3" defer></script>
+    <!-- 초기화 모듈 (마지막 실행) -->
+    <script src="js/init.js?v=4" defer></script>
+</body>
+</html>

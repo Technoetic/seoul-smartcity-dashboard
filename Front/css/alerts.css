@@ -1,0 +1,98 @@
+        /* 지역 진입 연출 오버레이: 구/동 클릭 시 화면 전체를 덮는 애니메이션 */
+        .location-announce {
+            position: fixed;  /* 화면에 고정 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;  /* 세로 중앙 정렬 */
+            align-items: center;      /* 가로 중앙 정렬 */
+            pointer-events: none;     /* 클릭 이벤트 통과 (배경만) */
+            z-index: 9999;            /* 최상위 레이어 */
+            opacity: 0;               /* 기본적으로 투명 (숨김) */
+            transition: opacity 0.6s ease;
+            background: radial-gradient(  /* 중앙에서 바깥쪽으로 퍼지는 어두운 배경 */
+                ellipse 80% 60% at 50% 50%,
+                rgba(0, 0, 0, 0.7) 0%,      /* 중앙 어두움 */
+                rgba(0, 0, 0, 0.5) 40%,
+                rgba(0, 0, 0, 0.3) 70%,
+                transparent 100%             /* 가장자리 투명 */
+            );
+        }
+
+        /* 연출 표시 상태 (JavaScript로 class 추가 시 나타남) */
+        .location-announce.visible {
+            opacity: 1;  /* 불투명하게 표시 */
+        }
+
+        /* 구(區) 이름 텍스트: 크게 빛나며 줌인 */
+        .location-announce .district-name {
+            font-size: 4rem;      /* 매우 큰 글자 */
+            font-weight: 900;     /* 굵은 폰트 */
+            color: #ffffff;
+            text-shadow:          /* 여러 겹의 청록색 빛 효과 */
+                0 0 20px rgba(0, 217, 255, 0.8),
+                0 0 40px rgba(0, 217, 255, 0.5),
+                0 0 60px rgba(0, 217, 255, 0.3),
+                2px 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 0.3em;  /* 글자 간격 넓게 */
+            transform: scale(0.8);  /* 초기 크기 작게 */
+            animation: locationZoomIn 0.6s ease-out forwards;  /* 줌인 애니메이션 */
+        }
+
+        /* 동(洞) 이름 텍스트: 구 이름 아래에 작게 페이드 인 */
+        .location-announce .dong-name {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);  /* 약간 투명한 흰색 */
+            text-shadow:
+                0 0 10px rgba(0, 217, 255, 0.5),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+            letter-spacing: 0.2em;
+            margin-top: 0.5rem;
+            opacity: 0;  /* 초기에는 투명 */
+            animation: locationFadeIn 0.5s ease-out 0.3s forwards;  /* 0.3초 후 페이드 인 */
+        }
+
+        /* 부제목 텍스트: Replay 모드 등의 추가 정보 */
+        .location-announce .subtitle {
+            font-size: 1rem;
+            color: rgba(155, 89, 182, 0.9);  /* 보라색 */
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+            margin-top: 1.5rem;
+            letter-spacing: 0.15em;
+            opacity: 0;  /* 초기에는 투명 */
+            animation: locationFadeIn 0.5s ease-out 0.5s forwards;  /* 0.5초 후 페이드 인 */
+        }
+
+        /* 알림 바: 대기오염 등 중요 알림을 상단에 흐르는 텍스트로 표시 */
+        .alert-bar {
+            background: linear-gradient(90deg, rgba(253, 203, 110, 0.15) 0%, rgba(225, 112, 85, 0.15) 100%);  /* 노란-주황 그라데이션 */
+            border-bottom: 1px solid var(--warning);  /* 노란색 하단 테두리 */
+            padding: 0.6rem 0;
+            overflow: hidden;  /* 넘치는 텍스트 숨김 (스크롤 효과용) */
+            width: 100%;
+        }
+
+        /* 흐르는 알림 텍스트 */
+        .alert-text {
+            display: inline-block;
+            font-size: 0.9rem;
+            color: var(--warning);  /* 노란색 텍스트 */
+            white-space: nowrap;    /* 줄바꿈 금지 */
+            padding-left: 100%;     /* 오른쪽 끝에서 시작 */
+            animation: scrollText 25s linear infinite;  /* 25초 동안 왼쪽으로 스크롤 반복 */
+        }
+
+        /* 위험 수준 알림 바 (더 심각한 경고) */
+        .alert-bar.danger {
+            background: linear-gradient(90deg, rgba(225, 112, 85, 0.2) 0%, rgba(214, 48, 49, 0.2) 100%);  /* 주황-빨강 그라데이션 */
+            border-bottom: 1px solid var(--danger);  /* 빨간색 하단 테두리 */
+        }
+
+        /* 위험 수준 알림 텍스트 */
+        .alert-bar.danger .alert-text {
+            color: var(--danger);  /* 빨간색 텍스트 */
+        }

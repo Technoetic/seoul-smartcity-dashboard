@@ -1,0 +1,32 @@
+/* 반응형 디자인: 다양한 화면 크기에 대응 */
+
+/* 태블릿 화면 (768px 이하) */
+@media (max-width: 768px) {
+    .navbar { padding: 0 1rem; }  /* 네비게이션 바 좁은 여백 */
+    .navbar-brand h1 { font-size: 1.1rem; }  /* 제목 크기 축소 */
+    .panel-box { width: 260px; }  /* 패널 너비 축소 */
+    .map-legend { gap: 0.8rem; font-size: 0.75rem; flex-wrap: wrap; }  /* 범례 축소 및 줄바꿈 */
+}
+
+/* 모바일 화면 (480px 이하) */
+@media (max-width: 480px) {
+    .navbar-brand h1 { display: none; }  /* 제목 숨김 (공간 절약) */
+    .panel-box { width: 100%; right: 0; border-radius: 0; }  /* 패널 전체 너비 */
+    .map-legend { flex-direction: column; align-items: center; padding: 0.3rem; font-size: 0.7rem; }  /* 범례 세로 배치 */
+}
+
+/* 대형 화면 (1200px 이상) */
+@media (min-width: 1200px) {
+    .map-container { width: 100%; }  /* 지도 컨테이너 전체 너비 */
+}
+
+/* 애니메이션 줄이기 설정 (사용자가 시스템에서 모션 감소를 선호할 때) */
+@media (prefers-reduced-motion: reduce) {
+    /* 모든 애니메이션 비활성화 */
+    .status-dot, .replay-indicator-dot, .district-path:hover, .dong-path:hover,
+    .district-stroke.level-danger, .dong-stroke.level-danger,
+    .sensor-marker.status-warning, .sensor-marker.status-danger,
+    .location-announce *, .alert-text, .loading-spinner {
+        animation: none !important;  /* 애니메이션 완전히 제거 */
+    }
+}

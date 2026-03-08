@@ -1,0 +1,29 @@
+        /* 지도 범례: 화면 하단에 온도 구간과 센서 타입을 표시하는 영역 */
+        .map-legend {
+            display: flex;
+            justify-content: center;  /* 중앙 정렬 */
+            gap: 1.5rem;  /* 각 항목 사이 간격 */
+            padding: 0.75rem;
+            background: var(--bg-tertiary);  /* 어두운 남색 배경 */
+            border-radius: 0;
+            position: absolute;  /* 지도 컨테이너 기준 절대 위치 */
+            bottom: 0;  /* 하단에 고정 */
+            left: 0;
+            right: 0;
+            z-index: 10;  /* 지도 위에 표시 */
+        }
+
+        /* 범례 항목: 색상 박스 + 텍스트 */
+        .legend-item {
+            display: flex;
+            align-items: center;  /* 세로 중앙 정렬 */
+            gap: 0.5rem;  /* 색상 박스와 텍스트 사이 간격 */
+            font-size: 0.85rem;
+        }
+
+        /* 범례 색상 박스 */
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;  /* 약간 둥근 모서리 */
+        }
