@@ -318,19 +318,14 @@ async def get_replay_data(
             # SQL 쿼리: 센서 데이터 + 위치 정보 조인
             cursor.execute("""
                 SELECT
-                    a.시리얼, a.자치구, a.행정동,  -- 센서 기본 정보
-                    a.온도_평균, a.습도_평균,  -- 센서 측정값
-                    DATE_FORMAT(a.등록일시, '%%Y%%m%%d%%H%%i') as MSRMT_HR,  -- 측정 시각 (형식 변환)
-                    a.등록일시,  -- 원본 등록 시각
-                    b.위도, b.경도,  -- 센서 위치 좌표
-                    b.자치구 as 자치구_한글,  -- 위치 정보 (한글)
-                    b.행정동 as 행정동_한글
-                FROM sdot_nature_all a  -- 센서 데이터 테이블
-                LEFT JOIN sdot_sensor_locations b ON a.시리얼 = b.시리얼  -- 위치 정보와 조인
-                WHERE a.등록일시 >= CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00')
-                  AND a.등록일시 < CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00') + INTERVAL 1 HOUR
-                ORDER BY a.시리얼  -- 센서 ID 순으로 정렬
-                LIMIT 100000  -- 최대 10만 건 (과도한 데이터 방지)
+                    시리얼, 자치구, 행정동,
+                    온도_평균, 습도_평균,
+                    DATE_FORMAT(등록일시, '%%Y%%m%%d%%H%%i') as MSRMT_HR,
+                    등록일시
+                FROM sdot_nature_all
+                WHERE 등록일시 >= CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00')
+                  AND 등록일시 < CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00') + INTERVAL 1 HOUR
+                LIMIT 100000
             """, (date, hour, date, hour))
             rows = cursor.fetchall()  # 모든 결과 가져오기
 
@@ -367,38 +362,43 @@ async def get_replay_data(
                     cursor = conn.cursor()
                     cursor.execute("""
                         SELECT
-                            a.시리얼, a.자치구, a.행정동,
-                            a.온도_평균, a.습도_평균,
-                            DATE_FORMAT(a.등록일시, '%%Y%%m%%d%%H%%i'),
-                            a.등록일시,
-                            b.위도, b.경도,
-                            b.자치구 as 자치구_한글,
-                            b.행정동 as 행정동_한글
-                        FROM sdot_nature_all a
-                        LEFT JOIN sdot_sensor_locations b ON a.시리얼 = b.시리얼
-                        WHERE a.등록일시 >= CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00')
-                          AND a.등록일시 < CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00') + INTERVAL 1 HOUR
-                        ORDER BY a.시리얼
+                            시리얼, 자치구, 행정동,
+                            온도_평균, 습도_평균,
+                            DATE_FORMAT(등록일시, '%%Y%%m%%d%%H%%i'),
+                            등록일시
+                        FROM sdot_nature_all
+                        WHERE 등록일시 >= CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00')
+                          AND 등록일시 < CONCAT(%s, ' ', LPAD(%s, 2, '0'), ':00:00') + INTERVAL 1 HOUR
                         LIMIT 100000
                     """, (date, best_hour, date, best_hour))
                     rows = cursor.fetchall()
                 logger.info(f"대체 시간 {best_hour}시 데이터 사용")
 
         # 5. 데이터 변환 (DB 행 → JSON 형식)
+        # 센서 위치 정보를 한 번에 조회하여 매핑
+        loc_map = {}
+        with get_db_connection() as conn2:
+            cursor2 = conn2.cursor()
+            cursor2.execute("SELECT 시리얼, 위도, 경도, 자치구, 행정동 FROM sdot_sensor_locations")
+            for loc in cursor2.fetchall():
+                loc_map[loc[0]] = {"lat": loc[1], "lng": loc[2], "cgg": loc[3], "dong": loc[4]}
+
         data = []
         for row in rows:
+            sn = row[0]
+            loc = loc_map.get(sn, {})
             sensor_data = {
-                "SN": row[0],  # Serial Number (센서 ID)
-                "CGG": row[1],  # 자치구
-                "DONG": row[2],  # 행정동
-                "AVG_TP": float(row[3]) if row[3] is not None else None,  # 평균 온도
-                "AVG_HUM": float(row[4]) if row[4] is not None else None,  # 평균 습도
-                "MSRMT_HR": row[5],  # 측정 시각 (형식: YYYYMMDDHHmm)
-                "REG_DT": str(row[6]) if row[6] else None,  # 등록 일시
-                "LAT": float(row[7]) if row[7] is not None else None,  # 위도
-                "LNG": float(row[8]) if row[8] is not None else None,  # 경도
-                "CGG_KO": row[9] if row[9] else None,  # 자치구 (한글)
-                "DONG_KO": row[10] if row[10] else None  # 행정동 (한글)
+                "SN": sn,
+                "CGG": row[1],
+                "DONG": row[2],
+                "AVG_TP": float(row[3]) if row[3] is not None else None,
+                "AVG_HUM": float(row[4]) if row[4] is not None else None,
+                "MSRMT_HR": row[5],
+                "REG_DT": str(row[6]) if row[6] else None,
+                "LAT": loc.get("lat"),
+                "LNG": loc.get("lng"),
+                "CGG_KO": loc.get("cgg"),
+                "DONG_KO": loc.get("dong")
             }
             data.append(sensor_data)
 
