@@ -195,6 +195,7 @@ erDiagram
     sdot_nature_all }o--|| sdot_sensor_locations : "시리얼"
 ```
 
+> [!NOTE]
 > **관계 설명**
 > - `sdot_nature_all.시리얼` → `sdot_sensor_locations.시리얼` : 센서 측정 데이터가 센서 위치를 참조 (논리적 FK, N:1)
 > - `weather_stations` / `rtd_locations` : 독립 참조 테이블 — API 레이어(`routes.py`)에서 `sdot_sensor_locations`와 합쳐 통합 센서 목록으로 제공
@@ -282,6 +283,9 @@ flowchart LR
 | `GET /api/v1/cache/stats` | 캐시 통계 | - | - |
 | `GET /api/v1/cache/clear` | 캐시 전체 삭제 | - | - |
 
+> [!WARNING]
+> `/api/v1/cache/clear`는 모든 LRU 캐시를 즉시 삭제합니다. 운영 환경에서 호출 시 일시적으로 DB 부하가 증가할 수 있으니 주의하세요.
+
 ---
 
 ## 프로젝트 구조
@@ -362,6 +366,9 @@ DB_NAME=sdot_db
 SDOT_API_KEY=your_seoul_api_key
 ```
 
+> [!IMPORTANT]
+> `SDOT_API_KEY`는 [서울 열린데이터 광장](https://data.seoul.go.kr/)에서 발급받은 인증키입니다. 키 없이는 실시간 센서 데이터를 수신할 수 없습니다.
+
 ### 2. 데이터베이스 설정
 
 ```sql
@@ -416,6 +423,9 @@ pip install -r requirements.txt
 cd FastAPI && python replay_api.py
 # http://localhost:8000
 ```
+
+> [!TIP]
+> 서버 시작 후 `http://localhost:8000`에 접속하면 대시보드를 확인할 수 있습니다. `/health` 엔드포인트로 DB 연결 상태를 먼저 점검하세요.
 
 ### 4. Docker 실행
 
@@ -518,7 +528,8 @@ Railway 내부에서 MySQL을 사용하려면:
 2. MySQL 서비스의 연결 정보가 환경변수로 자동 주입됨
 3. `DB_HOST`, `DB_PORT` 등을 Railway 제공 변수(`${{MySQL.MYSQL_HOST}}` 등)로 참조
 
-> **참고**: 이 프로젝트는 Railway 내부 MySQL을 사용합니다. 위 단계대로 MySQL 서비스를 추가하고 환경변수를 연결하세요.
+> [!CAUTION]
+> 이 프로젝트는 Railway 내부 MySQL을 사용합니다. MySQL 서비스를 추가하지 않으면 서버가 시작되지 않습니다. 반드시 위 단계대로 MySQL 서비스를 추가하고 환경변수를 연결하세요.
 
 ---
 
