@@ -107,32 +107,6 @@
 
 ---
 
-## 3D 데이터 모델
-
-> 아래 STL 파일을 클릭하면 GitHub 3D 뷰어에서 마우스로 회전/확대하며 확인할 수 있습니다.
-
-### 서울 25개 자치구 센서 밀도 맵
-
-자치구별 S-DoT 센서 설치 수를 높이로 표현한 3D 블록 맵입니다. 높을수록 센서 밀도가 높은 지역입니다.
-
-<div align="center">
-  <a href="docs/seoul-districts-3d.stl">
-    <img src="https://img.shields.io/badge/3D_Model-서울_자치구_센서맵-00d9ff?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Seoul Districts 3D">
-  </a>
-</div>
-
-### 45M 레코드 데이터 조형물
-
-45,259,792건의 데이터 수집량을 월별 방사형 바 차트로 시각화한 3D 조형물입니다. 중앙 기둥은 전체 데이터량, 방사형 바는 70개월간 월별 수집량을 나타냅니다.
-
-<div align="center">
-  <a href="docs/data-sculpture-45m.stl">
-    <img src="https://img.shields.io/badge/3D_Model-45M_데이터_조형물-e94560?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Data Sculpture 3D">
-  </a>
-</div>
-
----
-
 ## 시스템 아키텍처
 
 ```mermaid
