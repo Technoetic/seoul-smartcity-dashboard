@@ -4,7 +4,7 @@
 
 **서울시 전역 1,200+ IoT 센서의 환경 데이터를 실시간 시각화하는 도시 모니터링 플랫폼**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-서울_스마트시티_대시보드-00d9ff?style=for-the-badge&logo=googlemaps&logoColor=white)](https://seoul-smartcity-dashboard-production.up.railway.app/)
+[![Live Demo](docs/livedemo_button.gif)](https://seoul-smartcity-dashboard-production.up.railway.app/)
 
 <br>
 
