@@ -17,6 +17,10 @@
 
 <br>
 
+<img src="docs/intro_banner.gif" alt="S-DoT 스마트시티 배너" width="720">
+
+<br>
+
 <img src="docs/dashboard-preview.png" alt="대시보드 미리보기" width="720">
 
 </div>
@@ -46,11 +50,11 @@
 
 | 이름 | 역할 |
 |:----:|------|
-| 양우성 | 데이터 수집 · 수집 자동화 시스템 구축 · DB 설계 |
+| [양우성](https://github.com/woosungpr) | 데이터 수집 · 수집 자동화 시스템 구축 · DB 설계 |
 | [전문준](https://github.com/Technoetic/) | 데이터 수집/분석 · 전처리 · 시각화 |
 | [박형민](https://github.com/musclepark) | 데이터 분석 · 시계열 분석 · 트렌드 파악 |
-| 소혜경 | 기획 · 정책 제안 과제 발굴 · 보고서 작성 |
-| 이채영 | 기획 · 분석결과 정책적 해석 · 타당성 검토 |
+| [소혜경](https://github.com/ssohk26) | 기획 · 정책 제안 과제 발굴 · 보고서 작성 |
+| [이채영](https://github.com/chaeyoung-lee80) | 기획 · 분석결과 정책적 해석 · 타당성 검토 |
 
 ---
 
@@ -195,6 +199,45 @@ erDiagram
 > - `sdot_nature_all.시리얼` → `sdot_sensor_locations.시리얼` : 센서 측정 데이터가 센서 위치를 참조 (논리적 FK, N:1)
 > - `weather_stations` / `rtd_locations` : 독립 참조 테이블 — API 레이어(`routes.py`)에서 `sdot_sensor_locations`와 합쳐 통합 센서 목록으로 제공
 > - 물리적 FOREIGN KEY 제약은 미설정 (대량 INSERT 성능 우선)
+
+---
+
+## 주요 기능
+
+<div align="center">
+<img src="docs/mid_features.gif" alt="주요 기능 소개" width="720">
+</div>
+
+<br>
+
+### 실시간 모니터링
+
+| 기능 | 설명 |
+|:----:|------|
+| 🗺️ | 25개 자치구 **온도 히트맵** (영하/서늘/쾌적/더움/폭염) |
+| 🔍 | 자치구 → 행정동 → 센서 **3단계 드릴다운** |
+| 🌡️ | 온도, 습도, 소음, 풍향/풍속 **실시간 패널** |
+| 📡 | ASOS / AWS / RTD / S-DoT **센서 레이어 토글** |
+| ⚠️ | PM2.5 등 **이상치 감지 경보** 알림 바 |
+| 🧭 | SVG **풍향 나침반** 애니메이션 |
+
+### Replay (과거 데이터 재생)
+
+| 기능 | 설명 |
+|:----:|------|
+| 📅 | 날짜 선택 + 시간 **슬라이더** (0~23시) |
+| ▶️ | 0.5x / 1x / 2x **자동 재생** |
+| 🔎 | 데이터 없는 시간대 **±12시간 자동 탐색** |
+| 💾 | 오늘: 5분 / 과거: 7일 **TTL 캐시** |
+
+### API 서버 성능
+
+| 기능 | 설명 |
+|:----:|------|
+| 🗜️ | GZip 압축 (30~70% **전송량 절감**) |
+| 🔄 | 서울시 API **CORS 프록시** |
+| 📦 | LRU 캐시 **2,600 entries** |
+| 🔌 | DB 연결 풀 **최대 10 동시 연결** |
 
 ---
 
@@ -476,3 +519,9 @@ Railway 내부에서 MySQL을 사용하려면:
 3. `DB_HOST`, `DB_PORT` 등을 Railway 제공 변수(`${{MySQL.MYSQL_HOST}}` 등)로 참조
 
 > **참고**: 이 프로젝트는 Railway 내부 MySQL을 사용합니다. 위 단계대로 MySQL 서비스를 추가하고 환경변수를 연결하세요.
+
+---
+
+<div align="center">
+<img src="docs/outro_footer.gif" alt="S-DoT 팀 푸터" width="720">
+</div>
