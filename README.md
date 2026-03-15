@@ -48,6 +48,12 @@
 
 ## 팀 구성
 
+<div align="center">
+<img src="docs/team_showcase.gif" alt="Team S-DoT 소개" width="720">
+</div>
+
+<br>
+
 | 이름 | 역할 |
 |:----:|------|
 | [양우성](https://github.com/woosungpr) | 데이터 수집 · 수집 자동화 시스템 구축 · DB 설계 |
